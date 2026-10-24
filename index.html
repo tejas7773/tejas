@@ -51,10 +51,10 @@
 
         /* Editorial B&W Portrait Effect (knocks out white studio background into hero gray) */
         .editorial-portrait {
-            filter: grayscale(100%) contrast(125%) brightness(102%);
+            filter: grayscale(100%) contrast(118%) brightness(106%);
             mix-blend-mode: multiply;
-            -webkit-mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 46% 50% at 50% 52%, black 65%, transparent 98%);
+            mask-image: radial-gradient(ellipse 46% 50% at 50% 52%, black 65%, transparent 98%);
         }
 
         /* NLE Timeline Ruler ticks background */
@@ -349,18 +349,19 @@
                 Tejs Edits
             </h1>
 
-            <!-- Center Portrait Container -->
-            <div class="absolute inset-0 flex items-end justify-center pointer-events-none z-10 overflow-hidden">
-                <div class="relative w-[320px] sm:w-[460px] md:w-[540px] h-[94%] flex items-end justify-center">
-                    <!-- Uses uploaded portrait WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg with editorial B&W blend effect -->
-                    <img 
-                        src="img1.jpeg" 
-                        onerror="if(this.src.indexOf('image_54fb00.jpg')===-1){this.src='image_54fb00.jpg';}else{this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80';}"
-                        alt="Tejs - Video Editor & Cinematographer Portrait" 
-                        class="w-full h-full object-contain object-bottom editorial-portrait select-none"
-                    />
-                </div>
-            </div>
+            <!-- Center Landscape Portrait Container (No inner overflow/transform so mix-blend-mode: multiply blends directly with #E6E6E6 header) -->
+            <img 
+                src="img1.jpeg" 
+                onerror="if(this.src.indexOf('WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg')===-1){this.src='WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg';}else if(this.src.indexOf('image_54fb00.jpg')===-1){this.src='image_54fb00.jpg';}"
+                alt="Tejs - Video Editor & Cinematographer Portrait" 
+                class="
+                    absolute bottom-0 left-1/2 -translate-x-1/2 z-10
+                    w-[135vw] sm:w-[105vw] md:w-[92vw] lg:w-[82vw] max-w-[1380px]
+                    h-[78%] sm:h-[88%] md:h-[94%]
+                    object-cover object-top
+                    editorial-portrait select-none pointer-events-none
+                "
+            />
         </div>
 
         <!-- Hero Bottom Bar: Socials Left, Role Right (Matches Reference) -->
@@ -579,41 +580,36 @@
                     <i class="ph ph-device-mobile-camera text-brand-orange text-base"></i>
                     <span>02 / High-Retention Vertical Reels &amp; Shorts (9:16)</span>
                 </div>
-                <span class="text-xs font-mono text-neutral-500">1080 × 1920 • Viral Pacing</span>
+                <span class="text-xs font-mono text-neutral-500">1080 × 1920 • Instagram Reels &amp; MP4</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                <!-- Vertical Video Card 1 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                <!-- Vertical Video Card 1 (Embedded Instagram Reel: DZQScuwSlMU) -->
+                <!-- TIP: To change to another Instagram Reel, just replace "DZQScuwSlMU" in the iframe src & link below with any Reel's ID! -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10 flex flex-col">
                     <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
-                        <video 
-                            class="w-full h-full object-cover" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            poster="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80"
+                        <iframe 
+                            src="https://www.instagram.com/reel/DZQScuwSlMU/embed/" 
+                            class="w-full h-full border-0"
+                            allowtransparency="true" 
+                            allowfullscreen="true" 
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            loading="lazy"
+                            title="Tejs Instagram Reel Showcase"
+                        ></iframe>
+
+                        <!-- Top Right Instagram Badge + Direct Link -->
+                        <a 
+                            href="https://www.instagram.com/reel/DZQScuwSlMU/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/80 hover:bg-brand-orange backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono text-white transition"
                         >
-                            <source src="https://www.instagram.com/reel/DZQScuwSlMU/?utm_source=ig_web_copy_link&exln=NTc4MTIwNjQ2YQ==" type="video/mp4">
-                        </video>
-
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED</span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Meta Ninza</span>
-                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">3D Motion Hook &amp; Tech Breakdown Reel</h3>
-                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">After Effects + CapCut PC</p>
-                        </div>
+                            <i class="ph-fill ph-instagram-logo text-xs"></i>
+                            <span>IG REEL</span>
+                            <i class="ph ph-arrow-up-right text-[10px]"></i>
+                        </a>
                     </div>
                 </div>
 
