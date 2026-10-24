@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejs — Pro Video Editor & Cinematographer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono for timecode aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#E84A27', // Reference image orange-red
+                            light: '#E6E6E6',  // Reference image hero grey
+                            dark: '#0A0A0A',   // Deep carbon black
+                            card: '#141414',
+                            border: '#262626'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Editorial & NLE Timeline Styling */
+        body {
+            background-color: #0A0A0A;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        /* Blend mode for the reference image overlap effect */
+        .hero-title-blend {
+            mix-blend-mode: difference;
+            color: #ffffff;
+        }
+
+        /* Editorial B&W Portrait Effect (knocks out white studio background into hero gray) */
+        .editorial-portrait {
+            filter: grayscale(100%) contrast(125%) brightness(102%);
+            mix-blend-mode: multiply;
+            -webkit-mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+        }
+
+        /* NLE Timeline Ruler ticks background */
+        .timeline-ruler {
+            background-image: repeating-linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0.18) 0px,
+                rgba(255, 255, 255, 0.18) 1px,
+                transparent 1px,
+                transparent 12px
+            ),
+            repeating-linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0.4) 0px,
+                rgba(255, 255, 255, 0.4) 1px,
+                transparent 1px,
+                transparent 60px
+            );
+            background-size: 100% 6px, 100% 12px;
+            background-position: bottom;
+            background-repeat: repeat-x;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E84A27;
+        }
+
+        /* Subtle film grain texture */
+        .bg-grain {
+            background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* Video Card hover glow */
+        .video-card {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            border-color: #E84A27;
+        }
+
+        /* ========================================== */
+        /* CUSTOM DUAL-CIRCLE CURSOR (Reference UI)   */
+        /* ========================================== */
+        @media (hover: hover) and (pointer: fine) {
+            body, a, button, input, select, textarea, [data-video-card], #timeline-scrubber {
+                cursor: none !important;
+            }
+        }
+
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background-color: #C8B282; /* Warm gold-tan from reference image */
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease, transform 0.15s ease;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 48px;
+            height: 48px;
+            border: 1.5px solid rgba(200, 178, 130, 0.55); /* Subtle outer ring from reference */
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.3s ease,
+                        background-color 0.3s ease;
+        }
+
+        /* Cursor Hover State on Interactive Elements */
+        body.cursor-hover .cursor-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #E84A27;
+        }
+
+        body.cursor-hover .cursor-ring {
+            width: 68px;
+            height: 68px;
+            border-color: rgba(232, 74, 39, 0.85);
+            background-color: rgba(232, 74, 39, 0.12);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* ========================================== */
+        /* IPHONE / iOS FROSTED GLASSMORPHISM EFFECT  */
+        /* ========================================== */
+        .ios-glass {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.10) 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(20, 20, 20, 0.65) 100%
+            );
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow:
+                0 24px 48px -12px rgba(0, 0, 0, 0.75),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.28),
+                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .ios-glass-pill {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.14) 0%,
+                rgba(255, 255, 255, 0.04) 100%
+            );
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow:
+                0 8px 24px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0.5px rgba(255, 255, 255, 0.3);
+        }
+
+        .ios-glass-input {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        .ios-glass-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: #E84A27;
+            box-shadow: 0 0 0 3px rgba(232, 74, 39, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* ========================================== */
+        /* STICKY SCROLL CARD STACKING EFFECT         */
+        /* ========================================== */
+        .stack-cards-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            padding-bottom: 4rem;
+        }
+
+        .stack-card {
+            position: sticky;
+            transform-origin: center top;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.35s ease,
+                        border-color 0.3s ease,
+                        box-shadow 0.35s ease;
+            /* iPhone Translucent Frosted Glass Card Surface */
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.11) 0%,
+                rgba(255, 255, 255, 0.04) 45%,
+                rgba(18, 18, 18, 0.72) 100%
+            );
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow:
+                0 -18px 45px rgba(0, 0, 0, 0.8),
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.32),
+                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.06);
+            will-change: transform;
+            overflow: hidden;
+        }
+
+        /* Subtle diagonal iPhone glass sheen reflection */
+        .stack-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 60%);
+            pointer-events: none;
+        }
+
+        .stack-card:hover {
+            border-color: rgba(232, 74, 39, 0.65);
+            box-shadow:
+                0 -18px 45px rgba(0, 0, 0, 0.85),
+                0 20px 50px rgba(232, 74, 39, 0.12),
+                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.42);
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-orange selection:text-white">
+
+    <!-- Custom Dual-Circle Cursor Elements (Hidden on touch devices) -->
+    <div id="cursor-dot" class="cursor-dot hidden md:block"></div>
+    <div id="cursor-ring" class="cursor-ring hidden md:block"></div>
+
+    <!-- ========================================== -->
+    <!-- STICKY NLE EDITING TIMELINE SCROLL TRACKER -->
+    <!-- ========================================== -->
+    <div class="fixed top-0 left-0 w-full z-50 bg-black/55 backdrop-blur-2xl saturate-150 border-b border-white/15 select-none shadow-[0_10px_30px_rgba(0,0,0,0.65)]">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-3 text-[11px] font-mono">
+            
+            <!-- Left: Live Timecode & REC Indicator -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="flex items-center gap-1.5 bg-red-500/10 border border-red-500/30 px-2 py-0.5 rounded text-red-400">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span class="font-bold tracking-wider">REC</span>
+                </div>
+                <div id="timecode-display" class="text-brand-orange font-bold tracking-widest text-xs sm:text-sm bg-black/60 px-2.5 py-0.5 rounded border border-white/10">
+                    00:00:00:00
+                </div>
+            </div>
+
+            <!-- Center: Interactive NLE Sequence Track & Playhead -->
+            <div id="timeline-scrubber" class="relative flex-1 h-8 bg-[#161616] rounded border border-white/10 overflow-hidden cursor-pointer flex items-center">
+                <!-- Video & Audio Clips Visualization inside the bar -->
+                <div class="w-full h-full flex flex-col justify-between p-0.5 opacity-60">
+                    <!-- V1 Track -->
+                    <div class="w-full h-2.5 flex gap-1">
+                        <div class="w-1/5 bg-indigo-500/50 rounded-xs border-l-2 border-indigo-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">01_INTRO.mp4</div>
+                        <div class="w-2/5 bg-purple-500/50 rounded-xs border-l-2 border-purple-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">02_SHOWREEL_MASTER.prproj</div>
+                        <div class="w-1/5 bg-emerald-500/50 rounded-xs border-l-2 border-emerald-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">03_REVIEWS.mov</div>
+                        <div class="w-1/5 bg-amber-500/50 rounded-xs border-l-2 border-amber-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">04_CONTACT</div>
+                    </div>
+                    <!-- Ruler ticks at bottom -->
+                    <div class="w-full h-3 timeline-ruler"></div>
+                </div>
+
+                <!-- Active Progress Tint -->
+                <div id="timeline-progress" class="absolute top-0 left-0 h-full bg-brand-orange/15 pointer-events-none" style="width: 0%;"></div>
+
+                <!-- Red NLE Playhead -->
+                <div id="timeline-playhead" class="absolute top-0 bottom-0 w-[2px] bg-brand-orange pointer-events-none z-10 shadow-[0_0_8px_#E84A27]" style="left: 0%;">
+                    <!-- Playhead Cap -->
+                    <div class="w-3 h-2.5 bg-brand-orange -ml-[5px] clip-playhead rounded-t-xs"></div>
+                </div>
+            </div>
+
+            <!-- Right: Sequence Metadata -->
+            <div class="hidden md:flex items-center gap-3 text-white/50 shrink-0">
+                <span class="px-1.5 py-0.5 bg-white/5 rounded text-white/70">V1</span>
+                <span class="px-1.5 py-0.5 bg-white/5 rounded text-white/70">A1+A2</span>
+                <span>4K 60FPS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- HERO SECTION (Light Gray Reference Layout) -->
+    <!-- ========================================== -->
+    <header class="relative bg-[#E6E6E6] text-[#111111] pt-14 min-h-[90vh] flex flex-col justify-between overflow-hidden">
+        
+        <!-- Top Navigation Bar (Matches Reference) -->
+        <nav class="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between text-xs sm:text-sm font-medium tracking-tight z-30">
+            <a href="#" class="font-semibold hover:opacity-70 transition">© Tejs Visuals &amp; Edit</a>
+            <div class="flex items-center gap-6 sm:gap-16">
+                <a href="#work" class="hover:text-brand-orange transition">Projects</a>
+                <a href="#about" class="hover:text-brand-orange transition">About</a>
+                <a href="#reviews" class="hidden sm:inline-block hover:text-brand-orange transition">Reviews</a>
+                <a href="#contact" class="hover:text-brand-orange transition font-semibold">Contact</a>
+            </div>
+        </nav>
+
+        <!-- Center Editorial Portrait & Giant Overlapping Name -->
+        <div class="relative flex-1 flex items-center justify-center my-auto py-8 sm:py-0">
+            
+            <!-- Giant Typography (Spans full width, blends with portrait) -->
+            <h1 class="hero-title-blend relative z-20 text-[18vw] sm:text-[15.5vw] font-extrabold tracking-tighter leading-none select-none text-center w-full pointer-events-none">
+                Tejs Edits
+            </h1>
+
+            <!-- Center Portrait Container -->
+            <div class="absolute inset-0 flex items-end justify-center pointer-events-none z-10 overflow-hidden">
+                <div class="relative w-[320px] sm:w-[460px] md:w-[540px] h-[94%] flex items-end justify-center">
+                    <!-- Uses uploaded portrait WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg with editorial B&W blend effect -->
+                    <img 
+                        src="WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg" 
+                        onerror="if(this.src.indexOf('image_54fb00.jpg')===-1){this.src='image_54fb00.jpg';}else{this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80';}"
+                        alt="Tejs - Video Editor & Cinematographer Portrait" 
+                        class="w-full h-full object-contain object-bottom editorial-portrait select-none"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Bottom Bar: Socials Left, Role Right (Matches Reference) -->
+        <div class="w-full max-w-7xl mx-auto px-6 pb-8 pt-4 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 z-30">
+            
+            <!-- Left Social Links -->
+            <div class="flex flex-col gap-2 text-xs sm:text-sm font-medium">
+                <a href="https://wa.me/917020071100" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
+                    <i class="ph ph-whatsapp-logo text-lg group-hover:scale-110 transition"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#contact" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
+                    <i class="ph ph-instagram-logo text-lg group-hover:scale-110 transition"></i>
+                    <span>Instagram</span>
+                </a>
+                <a href="#work" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
+                    <i class="ph ph-film-strip text-lg group-hover:scale-110 transition"></i>
+                    <span>Showreel</span>
+                </a>
+            </div>
+
+            <!-- Right Role Title -->
+            <div class="text-left sm:text-right">
+                <p class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-[#111111]">
+                    <span class="text-brand-orange font-mono font-normal">//</span> Video Editor<br>
+                    Cinematographer
+                </p>
+                <p class="text-xs font-mono uppercase tracking-widest text-neutral-600 mt-1">
+                    Washim, Maharashtra • Worldwide
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- INTRO / ABOUT SECTION (Dark Reference UI)  -->
+    <!-- ========================================== -->
+    <section id="about" class="bg-brand-dark bg-grain py-20 sm:py-28 px-6 border-b border-white/10">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Section Tag -->
+            <div class="text-brand-orange font-mono text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span>// Intro</span>
+                <span class="h-[1px] w-10 bg-brand-orange/40"></span>
+            </div>
+
+            <!-- Clean, Short & Professional Dual-Color Statement -->
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.2] max-w-5xl">
+                I’m <span class="text-white">Tejs</span>, a <span class="text-brand-orange">video editor &amp; cinematographer from Washim, Maharashtra</span> crafting high-retention stories, sharp visuals, and clean cuts for brands and creators.
+            </h2>
+
+            <!-- Bottom Two-Column Bio & Software Stack -->
+            <div class="mt-14 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start lg:items-center">
+                
+                <!-- Left Software Badges -->
+                <div class="lg:col-span-7 flex flex-col gap-3.5">
+                    <p class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Primary Editing Suite</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <!-- Premiere Pro -->
+                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                            <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Pr</span>
+                            <div class="min-w-0">
+                                <div class="text-xs font-semibold text-white truncate">Premiere Pro</div>
+                                <div class="text-[10px] text-neutral-400 truncate">Timeline &amp; Color</div>
+                            </div>
+                        </div>
+                        <!-- After Effects -->
+                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                            <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Ae</span>
+                            <div class="min-w-0">
+                                <div class="text-xs font-semibold text-white truncate">After Effects</div>
+                                <div class="text-[10px] text-neutral-400 truncate">Motion &amp; VFX</div>
+                            </div>
+                        </div>
+                        <!-- CapCut PC -->
+                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                            <span class="w-9 h-9 shrink-0 rounded-xl bg-white text-black flex items-center justify-center font-extrabold text-[11px] shadow-inner">CC</span>
+                            <div class="min-w-0">
+                                <div class="text-xs font-semibold text-white truncate">CapCut PC</div>
+                                <div class="text-[10px] text-neutral-400 truncate">Fast-Paced Reels</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sub-paragraph & CTA Pill -->
+                <div class="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-5 lg:pl-6 lg:border-l lg:border-white/10">
+                    <p class="text-neutral-300 text-sm leading-relaxed max-w-md">
+                        From commercial films and wedding cinema to viral Reels—delivering polished, impactful edits with fast turnaround.
+                    </p>
+                    <a href="#work" class="shrink-0 inline-flex items-center gap-2.5 px-6 py-3 rounded-full ios-glass-pill text-xs sm:text-sm font-medium text-white hover:bg-brand-orange hover:border-brand-orange transition duration-300 group">
+                        <span>See my Work</span>
+                        <i class="ph ph-arrow-down-right text-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SELECTED WORK (2 HORIZONTAL + 4 VERTICAL)  -->
+    <!-- ========================================== -->
+    <section id="work" class="py-24 sm:py-32 px-6 bg-[#0A0A0A] border-b border-white/10">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Section Header -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+                <div>
+                    <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3">
+                        // Timeline Masterpieces
+                    </div>
+                    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight">Selected Edits</h2>
+                </div>
+                <div class="flex items-center gap-2.5 ios-glass-pill px-4 py-2.5 rounded-full text-xs sm:text-sm text-neutral-200 self-start md:self-auto">
+                    <i class="ph-fill ph-speaker-high text-brand-orange text-base animate-pulse"></i>
+                    <span class="hidden sm:inline">Hover over any video to Play &amp; Unmute</span>
+                    <span class="sm:hidden">Tap any video play button to Play &amp; Unmute</span>
+                </div>
+            </div>
+
+            <!-- 1. HORIZONTAL VIDEOS (2 Long-Form 16:9 Showcases) -->
+            <div class="mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
+                    <i class="ph ph-monitor-play text-brand-orange text-base"></i>
+                    <span>01 / Horizontal Widescreen Edits (16:9)</span>
+                </div>
+                <span class="text-xs font-mono text-neutral-500">1920 × 1080 • 60 FPS</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-20">
+                
+                <!-- Horizontal Video Card 1 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-video w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80"
+                        >
+                            <source src="https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-308-large.mp4" type="video/mp4">
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        </video>
+
+                        <!-- Dark Gradient Overlay -->
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <!-- Center Play / Tap Button (Visible when paused or on mobile) -->
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <!-- Top Right Status Pill -->
+                        <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED • PAUSED</span>
+                        </div>
+
+                        <!-- Bottom Metadata -->
+                        <div class="absolute bottom-4 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                            <div>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Commercial Documentary</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Cinematic Brand Story &amp; Sound Design</h3>
+                            </div>
+                            <span class="text-xs font-mono text-white/70 bg-black/60 px-2 py-1 rounded">Pr + Ae</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Video Card 2 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-video w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1000&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+                        </video>
+
+                        <!-- Dark Gradient Overlay -->
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <!-- Top Right Status Pill -->
+                        <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED • PAUSED</span>
+                        </div>
+
+                        <!-- Bottom Metadata -->
+                        <div class="absolute bottom-4 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                            <div>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Luxury Wedding &amp; Event</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Wedprisam — Royal Wedding Aftermovie</h3>
+                            </div>
+                            <span class="text-xs font-mono text-white/70 bg-black/60 px-2 py-1 rounded">Premiere Pro</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 2. VERTICAL VIDEOS (4 Short-Form 9:16 Reels/Shorts) -->
+            <div class="mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
+                    <i class="ph ph-device-mobile-camera text-brand-orange text-base"></i>
+                    <span>02 / High-Retention Vertical Reels &amp; Shorts (9:16)</span>
+                </div>
+                <span class="text-xs font-mono text-neutral-500">1080 × 1920 • Viral Pacing</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Vertical Video Card 1 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+                        </video>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED</span>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Meta Ninza</span>
+                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">3D Motion Hook &amp; Tech Breakdown Reel</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">After Effects + CapCut PC</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Video Card 2 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4" type="video/mp4">
+                        </video>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED</span>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Pizzatoons</span>
+                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Fast-Cut Food Commercial &amp; SFX</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">Premiere Pro + SFX</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Video Card 3 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
+                        </video>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED</span>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Sahib Kaur</span>
+                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Creator Lifestyle &amp; Kinetic Captions</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">CapCut PC + After Effects</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Video Card 4 -->
+                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
+                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        </video>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
+                            <span class="status-text text-neutral-300">MUTED</span>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Raksha Hospitality</span>
+                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Luxury Resort Property Tour &amp; Speed Ramp</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">Premiere Pro + Color Grade</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- CLIENT FEEDBACK / TESTIMONIALS SECTION     -->
+    <!-- (STICKY SCROLL STACKING CARDS EFFECT)      -->
+    <!-- ========================================== -->
+    <section id="reviews" class="relative py-24 sm:py-32 px-6 bg-brand-dark bg-grain border-b border-white/10">
+        <!-- Ambient iOS Backlight Orbs (Makes the iPhone Frosted Glass Blur Pop as Cards Stack) -->
+        <div class="pointer-events-none absolute inset-0 overflow-hidden">
+            <div class="sticky top-1/3 mx-auto max-w-4xl h-96 flex items-center justify-between px-8 opacity-60">
+                <div class="w-72 h-72 rounded-full bg-brand-orange/25 blur-[110px]"></div>
+                <div class="w-80 h-80 rounded-full bg-indigo-500/20 blur-[120px]"></div>
+                <div class="w-64 h-64 rounded-full bg-amber-400/15 blur-[100px]"></div>
+            </div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
+            
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                <div>
+                    <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2.5">
+                        <span>// Client Endorsements</span>
+                        <span class="px-2.5 py-0.5 text-[10px] ios-glass-pill text-brand-orange rounded-full">iOS Glass Stack</span>
+                    </div>
+                    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight">Trusted by Brands &amp; Creators</h2>
+                </div>
+                <p class="text-neutral-400 text-sm sm:text-base max-w-md leading-relaxed">
+                    Real feedback from teams, founders, and creators who trusted Tejs with their post-production workflow.
+                </p>
+            </div>
+
+            <!-- 6 Sticky Scroll-Stacking iPhone Glass Client Feedback Cards -->
+            <div class="stack-cards-container max-w-5xl mx-auto" id="testimonial-stack">
+                
+                <!-- Card 01: Pizzatoons -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 84px; z-index: 10;" data-stack-index="0">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">01 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Animation &amp; Food Brand</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Tejs completely transformed our animated shorts and food promos. His comedic timing, punchy sound effects, and snappy transitions in Premiere Pro boosted our average watch time almost immediately. Super easy to work with!”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-brand-orange text-base">
+                                PZ
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Pizzatoons</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Creative Content Studio</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+                <!-- Card 02: Meta Ninza -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 104px; z-index: 20;" data-stack-index="1">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">02 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Tech &amp; Digital Media</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Finding an editor who understands fast-paced tech content is rare. Tejs nailed our After Effects motion graphics and retention hooks from day one. Our Reels look cleaner, sharper, and consistently outperform our older videos.”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-indigo-300 text-base">
+                                MN
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Meta Ninza</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Digital Brand &amp; Creator</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+                <!-- Card 03: Sahib Kaur -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 124px; z-index: 30;" data-stack-index="2">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">03 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Lifestyle Creator</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Working with Tejs has been a blessing for my content schedule. He knows exactly how to match the vibe, music, and aesthetic I want without me having to over-explain. Fast delivery and zero compromise on quality!”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-pink-300 text-base">
+                                SK
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Sahib Kaur</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Influencer &amp; Public Figure</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+                <!-- Card 04: Wedprisam -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 144px; z-index: 40;" data-stack-index="3">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">04 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Wedding Cinema</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Wedding films require deep emotion, seamless rhythm, and rich color grading. Tejs took hours of our raw multi-cam footage and crafted breathtaking cinematic teasers and reels that left our couples speechless.”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-amber-300 text-base">
+                                WP
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Wedprisam</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Luxury Wedding Films</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+                <!-- Card 05: Vault of Gallery -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 164px; z-index: 50;" data-stack-index="4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">05 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Visual Curation</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Aesthetic perfection! For Vault of Gallery, every frame needs to look like art. Tejs’s eye for speed-ramping, subtle visual effects, and atmospheric audio design gave our visual reels an unmistakable signature style.”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-emerald-300 text-base">
+                                VG
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Vault of Gallery</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Art &amp; Visual Collective</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+                <!-- Card 06: Raksha Hospitality -->
+                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 184px; z-index: 60;" data-stack-index="5">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">06 / 06</span>
+                            <div class="flex text-brand-orange text-base gap-0.5">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Hospitality &amp; Hotels</span>
+                    </div>
+                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
+                        “Tejs helped us showcase our properties and dining experiences with a truly premium feel. His promotional edits brought out the warmth and luxury of Raksha Hospitality, driving real inquiries from social media.”
+                    </p>
+                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-cyan-300 text-base">
+                                RH
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Raksha Hospitality</h4>
+                                <p class="text-xs sm:text-sm text-neutral-300">Hospitality Brand</p>
+                            </div>
+                        </div>
+                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- CONTACT / WHATSAPP REDIRECT FORM SECTION   -->
+    <!-- ========================================== -->
+    <section id="contact" class="py-24 sm:py-32 px-6 bg-[#0A0A0A] relative overflow-hidden">
+        <!-- Ambient Glow Behind iPhone Glass Contact Card -->
+        <div class="pointer-events-none absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-brand-orange/20 blur-[130px]"></div>
+        <div class="pointer-events-none absolute top-16 left-10 w-80 h-80 rounded-full bg-indigo-500/10 blur-[120px]"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-stretch">
+                
+                <!-- Left Column: Callout & Direct Info -->
+                <div class="lg:col-span-5 flex flex-col justify-between space-y-8">
+                    <div>
+                        <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <span>// Start a Project</span>
+                            <span class="h-[1px] w-8 bg-brand-orange/40"></span>
+                        </div>
+                        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] text-white">
+                            Let’s Edit Your Next <span class="text-brand-orange">Viral Video.</span>
+                        </h2>
+                        <p class="text-neutral-400 text-sm sm:text-base leading-relaxed mt-4">
+                            Fill out the project brief and your details will be formatted and sent directly to my WhatsApp so we can discuss your timeline, style references, and deliverables immediately.
+                        </p>
+                    </div>
+
+                    <!-- Aligned Direct Contact Info Cards -->
+                    <div class="space-y-3.5">
+                        <!-- WhatsApp Direct -->
+                        <a href="https://wa.me/917020071100" target="_blank" rel="noopener noreferrer" class="ios-glass-pill p-4 rounded-2xl flex items-center justify-between group hover:border-brand-orange/60 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="ph-fill ph-whatsapp-logo"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Direct WhatsApp</div>
+                                    <div class="text-sm sm:text-base font-bold text-white group-hover:text-brand-orange transition">+91 7020071100</div>
+                                </div>
+                            </div>
+                            <i class="ph ph-arrow-up-right text-lg text-neutral-400 group-hover:text-brand-orange group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"></i>
+                        </a>
+
+                        <!-- Location -->
+                        <div class="ios-glass-pill p-4 rounded-2xl flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-brand-orange/15 border border-brand-orange/30 text-brand-orange flex items-center justify-center text-xl shrink-0">
+                                <i class="ph-fill ph-map-pin"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Base Location</div>
+                                <div class="text-sm sm:text-base font-semibold text-white">Washim, Maharashtra, India</div>
+                            </div>
+                        </div>
+
+                        <!-- Software & Turnaround -->
+                        <div class="ios-glass-pill p-4 rounded-2xl flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl shrink-0">
+                                <i class="ph-fill ph-film-slate"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Post-Production Workflow</div>
+                                <div class="text-sm font-medium text-neutral-200">Premiere Pro • After Effects • CapCut PC</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: WhatsApp Lead Form (iPhone Frosted Glass Panel) -->
+                <div class="lg:col-span-7 ios-glass p-6 sm:p-10 rounded-[32px] flex flex-col justify-between">
+                    <div class="mb-6 pb-4 border-b border-white/10 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-white">Project Inquiry Form</h3>
+                            <p class="text-xs text-neutral-400 mt-0.5">Instant redirect to WhatsApp chat (+91 7020071100)</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full ios-glass-pill text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Online
+                        </span>
+                    </div>
+
+                    <form id="whatsapp-form" class="space-y-5">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <!-- Name -->
+                            <div class="flex flex-col">
+                                <label for="client-name" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
+                                    Your Name <span class="text-brand-orange">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="client-name" 
+                                    required 
+                                    placeholder="e.g. Rahul Sharma"
+                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
+                                />
+                            </div>
+
+                            <!-- Email -->
+                            <div class="flex flex-col">
+                                <label for="client-email" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
+                                    Email Address <span class="text-brand-orange">*</span>
+                                </label>
+                                <input 
+                                    type="email" 
+                                    id="client-email" 
+                                    required 
+                                    placeholder="e.g. rahul@brand.com"
+                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <!-- Instagram ID (Optional) -->
+                            <div class="flex flex-col">
+                                <label for="client-insta" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
+                                    Instagram ID <span class="text-neutral-500">(Optional)</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="client-insta" 
+                                    placeholder="e.g. @yourhandle"
+                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
+                                />
+                            </div>
+
+                            <!-- Video Type -->
+                            <div class="flex flex-col">
+                                <label for="project-type" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
+                                    Service Needed
+                                </label>
+                                <div class="relative">
+                                    <select 
+                                        id="project-type"
+                                        class="w-full h-12 ios-glass-input rounded-2xl px-4 pr-10 text-sm text-white outline-none transition bg-[#141414]/90 appearance-none"
+                                    >
+                                        <option value="Instagram Reels / YouTube Shorts" class="bg-[#141414] text-white">Vertical Reels / Shorts (9:16)</option>
+                                        <option value="YouTube Long-Form Video" class="bg-[#141414] text-white">Horizontal YouTube / Documentary (16:9)</option>
+                                        <option value="Motion Graphics & VFX" class="bg-[#141414] text-white">After Effects Motion Graphics</option>
+                                        <option value="Wedding / Event Highlight" class="bg-[#141414] text-white">Wedding / Event Highlight</option>
+                                        <option value="Monthly Retainer Package" class="bg-[#141414] text-white">Monthly Retainer Package</option>
+                                    </select>
+                                    <i class="ph ph-caret-down text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="flex flex-col">
+                            <label for="client-message" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
+                                Project Details / Message <span class="text-brand-orange">*</span>
+                            </label>
+                            <textarea 
+                                id="client-message" 
+                                rows="4" 
+                                required
+                                placeholder="Tell me about your videos, reference style, or timeline..."
+                                class="w-full ios-glass-input rounded-2xl p-4 text-sm text-white placeholder-neutral-500 outline-none transition resize-none"
+                            ></textarea>
+                        </div>
+
+                        <!-- Submit to WhatsApp Button -->
+                        <button 
+                            type="submit" 
+                            class="w-full h-14 bg-brand-orange hover:bg-[#ff5733] text-white font-bold px-6 rounded-2xl flex items-center justify-center gap-3 transition duration-300 shadow-lg shadow-brand-orange/25"
+                        >
+                            <i class="ph-fill ph-whatsapp-logo text-xl"></i>
+                            <span>Send Inquiry to Tejs on WhatsApp</span>
+                        </button>
+
+                        <!-- Status Notification Box (No alert()) -->
+                        <div id="form-feedback" class="hidden p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center justify-between">
+                            <span>Redirecting your details to WhatsApp (+91 7020071100)...</span>
+                            <a id="fallback-wa-link" href="#" target="_blank" class="underline font-bold">Open manually</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#060606] border-t border-white/10 py-8 px-6 text-xs text-neutral-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>© 2026 Tejs — Video Editor (Washim, Maharashtra). All rights reserved.</div>
+            <div class="font-mono text-neutral-400">Adobe Premiere Pro • After Effects • CapCut PC</div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE SCRIPTS                        -->
+    <!-- ========================================== -->
+    <script>
+        // 1. NLE EDITING TIMELINE SCROLL & SCRUBBING LOGIC
+        const timecodeDisplay = document.getElementById('timecode-display');
+        const timelineProgress = document.getElementById('timeline-progress');
+        const timelinePlayhead = document.getElementById('timeline-playhead');
+        const timelineScrubber = document.getElementById('timeline-scrubber');
+
+        function formatSMPTE(scrollPercent) {
+            // Simulate a 3-minute master sequence at 60fps
+            const totalFrames = Math.floor(scrollPercent * 10800); 
+            const frames = totalFrames % 60;
+            const totalSeconds = Math.floor(totalFrames / 60);
+            const seconds = totalSeconds % 60;
+            const minutes = Math.floor(totalSeconds / 60) % 60;
+
+            const pad = (n) => String(n).padStart(2, '0');
+            return `00:${pad(minutes)}:${pad(seconds)}:${pad(frames)}`;
+        }
+
+        function updateTimelineOnScroll() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
+            const pctString = (scrollPercent * 100).toFixed(2) + '%';
+
+            timelineProgress.style.width = pctString;
+            timelinePlayhead.style.left = pctString;
+            timecodeDisplay.textContent = formatSMPTE(scrollPercent);
+        }
+
+        window.addEventListener('scroll', updateTimelineOnScroll, { passive: true });
+        updateTimelineOnScroll();
+
+        // Allow clicking on the NLE timeline bar to scrub the page
+        timelineScrubber.addEventListener('click', (e) => {
+            const rect = timelineScrubber.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const ratio = Math.min(Math.max(clickX / rect.width, 0), 1);
+            const targetScroll = ratio * (document.documentElement.scrollHeight - document.documentElement.clientHeight);
+            window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+        });
+
+        // 2. VIDEO HOVER PLAY/UNMUTE + MOBILE TAP PLAY BUTTON
+        const videoCards = document.querySelectorAll('[data-video-card]');
+
+        function stopAllOtherVideos(currentVideo) {
+            videoCards.forEach(card => {
+                const vid = card.querySelector('video');
+                if (vid !== currentVideo) {
+                    pauseAndMuteCard(card);
+                }
+            });
+        }
+
+        function playAndUnmuteCard(card) {
+            const video = card.querySelector('video');
+            const iconState = card.querySelector('.icon-state');
+            const soundIcon = card.querySelector('.sound-icon');
+            const statusText = card.querySelector('.status-text');
+            const playTrigger = card.querySelector('.play-trigger');
+
+            stopAllOtherVideos(video);
+
+            video.muted = false;
+            const playPromise = video.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Successfully playing with audio
+                    iconState.className = 'ph-fill ph-pause text-2xl icon-state';
+                    soundIcon.className = 'ph-fill ph-speaker-high text-brand-orange sound-icon';
+                    statusText.textContent = 'PLAYING • AUDIO ON';
+                    playTrigger.classList.add('opacity-0', 'sm:group-hover:opacity-0');
+                }).catch(() => {
+                    // Browser blocked unmuted hover autoplay before user interaction; fallback to muted play
+                    video.muted = true;
+                    video.play().catch(() => {});
+                    iconState.className = 'ph-fill ph-speaker-simple-high text-2xl icon-state';
+                    soundIcon.className = 'ph-fill ph-speaker-slash text-amber-400 sound-icon';
+                    statusText.textContent = 'TAP FOR AUDIO';
+                });
+            }
+        }
+
+        function pauseAndMuteCard(card) {
+            const video = card.querySelector('video');
+            const iconState = card.querySelector('.icon-state');
+            const soundIcon = card.querySelector('.sound-icon');
+            const statusText = card.querySelector('.status-text');
+            const playTrigger = card.querySelector('.play-trigger');
+
+            video.pause();
+            video.muted = true;
+            iconState.className = 'ph-fill ph-play text-2xl ml-0.5 icon-state';
+            soundIcon.className = 'ph-fill ph-speaker-slash text-neutral-400 sound-icon';
+            statusText.textContent = 'MUTED • PAUSED';
+            playTrigger.classList.remove('opacity-0');
+        }
+
+        videoCards.forEach(card => {
+            const video = card.querySelector('video');
+            const playBtn = card.querySelector('.play-trigger');
+
+            // Desktop Hover: Play & Unmute on mouseenter, Pause & Mute on mouseleave
+            card.addEventListener('mouseenter', () => {
+                if (window.matchMedia('(hover: hover)').matches) {
+                    playAndUnmuteCard(card);
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                if (window.matchMedia('(hover: hover)').matches) {
+                    pauseAndMuteCard(card);
+                }
+            });
+
+            // Mobile & Desktop Tap/Click on Play Button or Card
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (video.paused || video.muted) {
+                    playAndUnmuteCard(card);
+                } else {
+                    pauseAndMuteCard(card);
+                }
+            });
+        });
+
+        // 3. WHATSAPP REDIRECT FORM (+91 7020071100)
+        const whatsappForm = document.getElementById('whatsapp-form');
+        const formFeedback = document.getElementById('form-feedback');
+        const fallbackWaLink = document.getElementById('fallback-wa-link');
+
+        whatsappForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('client-name').value.trim();
+            const email = document.getElementById('client-email').value.trim();
+            const insta = document.getElementById('client-insta').value.trim() || 'Not provided';
+            const service = document.getElementById('project-type').value;
+            const message = document.getElementById('client-message').value.trim();
+
+            const whatsappNumber = '917020071100';
+
+            const formattedText = 
+                `*New Portfolio Inquiry for Tejs*%0A%0A` +
+                `*Name:* ${encodeURIComponent(name)}%0A` +
+                `*Email:* ${encodeURIComponent(email)}%0A` +
+                `*Instagram:* ${encodeURIComponent(insta)}%0A` +
+                `*Service:* ${encodeURIComponent(service)}%0A` +
+                `*Project Details:* ${encodeURIComponent(message)}`;
+
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${formattedText}`;
+
+            // Show inline confirmation and open WhatsApp
+            fallbackWaLink.href = whatsappURL;
+            formFeedback.classList.remove('hidden');
+
+            window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+        });
+
+        // 4. CUSTOM DUAL-CIRCLE FOLLOWER CURSOR (Matches Reference Image)
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+
+        if (cursorDot && cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let ringX = mouseX;
+            let ringY = mouseY;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                // Center dot tracks immediately
+                cursorDot.style.left = `${mouseX}px`;
+                cursorDot.style.top = `${mouseY}px`;
+            });
+
+            // Smooth trailing interpolation for the outer ring
+            function animateCursorRing() {
+                ringX += (mouseX - ringX) * 0.18;
+                ringY += (mouseY - ringY) * 0.18;
+                cursorRing.style.left = `${ringX}px`;
+                cursorRing.style.top = `${ringY}px`;
+                requestAnimationFrame(animateCursorRing);
+            }
+            requestAnimationFrame(animateCursorRing);
+
+            // Expand ring on interactive elements
+            const interactiveSelectors = 'a, button, input, select, textarea, [data-video-card], #timeline-scrubber, .stack-card';
+            document.querySelectorAll(interactiveSelectors).forEach((el) => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+
+        // 5. STICKY SCROLL STACKING CARDS DEPTH SCALE EFFECT
+        const stackCards = document.querySelectorAll('.stack-card');
+
+        function updateCardStackDepth() {
+            stackCards.forEach((card, index) => {
+                const nextCard = stackCards[index + 1];
+                if (!nextCard) return;
+
+                const cardRect = card.getBoundingClientRect();
+                const nextRect = nextCard.getBoundingClientRect();
+                const stickyTop = parseFloat(card.style.top) || 84;
+
+                // When the card is pinned at its sticky offset and the next card scrolls up over it
+                if (cardRect.top <= stickyTop + 5) {
+                    const distance = Math.max(0, nextRect.top - stickyTop);
+                    const maxDistance = 360;
+                    const overlapRatio = 1 - Math.min(distance / maxDistance, 1);
+
+                    const scale = 1 - (overlapRatio * 0.045); // Subtle scale down as cards stack on top
+                    const brightness = 1 - (overlapRatio * 0.28);
+                    card.style.transform = `scale(${scale.toFixed(4)})`;
+                    card.style.filter = `brightness(${brightness.toFixed(3)})`;
+                } else {
+                    card.style.transform = 'scale(1)';
+                    card.style.filter = 'brightness(1)';
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateCardStackDepth, { passive: true });
+        updateCardStackDepth();
+    </script>
+</body>
+</html>
