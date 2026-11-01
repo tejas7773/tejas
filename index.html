@@ -677,501 +677,212 @@
                     <span>01 / Horizontal Widescreen Edits + Gaming &amp; Brand Showcases (16:9)</span>
                 </div>
                 <span class="px-3 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange self-start sm:self-auto">
-                    4 Showcases • 1920 × 1080 • 60 FPS
+                    4 Showcases • 16:9
                 </span>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-20">
-                
-                <!-- Horizontal Video Card 1 (INTERACTIVE BEFORE / AFTER SPLIT-SCREEN WIPE: Cinematic Brand Story & Sound Design) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 0ms;" data-video-card data-ba-split-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden select-none">
-                        <!-- Main Video (AFTER: Color Graded + Sound Design Master) -->
-                        <video 
-                            class="w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            poster="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80"
-                        >
-                            <source src="meta ninza_1.mp4" type="video/mp4">
+
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 0ms;" data-video-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
                             <source src="meta ninza_1.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Clipped Overlay Video (BEFORE: Flat Raw S-Log3 Camera Footage) -->
-                        <div class="ba-before-layer absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
-                            <video 
-                                class="ba-sync-video w-full h-full object-cover raw-footage-look" 
-                                loop 
-                                muted 
-                                playsinline 
-                                preload="metadata"
-                                poster="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80"
-                            >
-                                <source src="https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-308-large.mp4" type="video/mp4">
-                                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
-                            </video>
-                            <!-- Raw Log Watermark Tag -->
-                            <div class="absolute top-14 left-4 ios-glass-pill px-2.5 py-1 rounded-full text-[9px] font-mono text-neutral-200 uppercase tracking-widest">
-                                BEFORE • RAW S-LOG3 (NO SFX)
-                            </div>
-                        </div>
-
-                        <!-- After Graded Tag -->
-                        <div class="absolute top-14 right-4 z-10 bg-brand-orange/90 backdrop-blur-xl border border-white/30 px-2.5 py-1 rounded-full text-[9px] font-mono text-white font-bold uppercase tracking-widest pointer-events-none shadow-lg">
-                            AFTER • GRADED + SFX MASTER
-                        </div>
-
-                        <!-- Vertical Split Divider Line & Liquid Glass Handle -->
-                        <div class="ba-divider-line absolute top-0 bottom-0 w-[2px] bg-white/90 z-20 pointer-events-none shadow-[0_0_16px_#E84A27]" style="left: 50%;">
-                            <div class="w-9 h-9 -ml-[17px] top-1/2 -translate-y-1/2 relative rounded-full ios-glass-pill border border-white/60 text-white flex items-center justify-center shadow-2xl">
-                                <i class="ph-bold ph-arrows-out-line-horizontal text-xs text-brand-orange"></i>
-                            </div>
-                        </div>
-
-                        <!-- Invisible Range Input for Dragging Split Wipe -->
-                        <input 
-                            type="range" 
-                            min="5" 
-                            max="95" 
-                            value="50" 
-                            aria-label="Before and After comparison slider for Cinematic Brand Story"
-                            class="ba-range-slider absolute inset-x-0 top-12 bottom-20 w-full h-[calc(100%-8rem)] z-30 opacity-0 cursor-ew-resize"
-                        />
-
-                        <!-- Dark Gradient Overlay -->
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-                            <!-- Center Play / Tap Button -->
-                            <button type="button" aria-label="Play video with sound" class="play-trigger pointer-events-auto w-14 h-14 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300 ml-24">
-                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Left Drag Split Indicator -->
-                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-brand-orange font-semibold">
-                            <i class="ph-bold ph-columns"></i>
-                            <span>DRAG BEFORE / AFTER</span>
-                        </div>
-
-                        <!-- Top Right Status Pill -->
                         <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
                             <span class="status-text text-neutral-200">MUTED • PAUSED</span>
                         </div>
-
-                        <!-- Bottom Metadata -->
                         <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
                             <div>
-                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
-                                    <i class="ph-bold ph-waveform"></i>
-                                    <span>Result: Full 5.1 SFX + Cinema Grade</span>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Commercial Documentary</span>
-                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Cinematic Brand Story &amp; Sound Design</h3>
-                                </div>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Brand Film</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Cinematic Brand Story</h3>
                             </div>
                             <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Pr + Ae</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Horizontal Video Card 2 (Liquid Glass Frame) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 120ms;" data-video-card>
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 60ms;" data-video-card>
                     <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video 
-                            class="w-full h-full object-cover" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                          
-                        >
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
                             <source src="VJ Event_2.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Dark Gradient Overlay -->
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
                             <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Right Status Pill -->
                         <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
                             <span class="status-text text-neutral-200">MUTED • PAUSED</span>
                         </div>
-
-                        <!-- Bottom Metadata -->
                         <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
                             <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Luxury Wedding &amp; Event</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Wedprisam — Royal Wedding Aftermovie</h3>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Wedding &amp; Events</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Royal Wedding Aftermovie</h3>
                             </div>
                             <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Premiere Pro</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Horizontal Video Card 3 (Gaming Videos Edits - 60FPS Montage, Velocity, 3D HUD & SFX) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 80ms;" data-video-card>
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 120ms;" data-video-card>
                     <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video 
-                            class="w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            
-                        >
-                            <source src="6MONTH BABY demo_1.mp4" type="video/mp4">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
                             <source src="6MONTH BABY demo_1.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Dark Gradient Overlay -->
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play gaming video edit with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-
-                        <!-- Top Left FPS / Beat Sync Badge -->
-                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-emerald-300 font-semibold">
-                            <i class="ph-fill ph-game-controller text-brand-orange text-xs"></i>
-                            <span>240FPS VELOCITY • BEAT SYNC</span>
-                        </div>
-
-                        <!-- Top Right Status Pill -->
-                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
-                        </div>
-
-                        <!-- Bottom Metadata -->
-                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
-                            <div>
-                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
-                                    <i class="ph-bold ph-lightning"></i>
-                                    <span>3D Camera Track + Shake &amp; Saber VFX</span>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Esports &amp; Gaming Montage</span>
-                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Gaming Videos Edits</h3>
-                                </div>
-                            </div>
-                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Ae + Pr + CC</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Horizontal Video Card 4 (High-Energy Commercial & Motion VFX Showreel) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video 
-                            class="w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            poster="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1000&q=80"
-                        >
-                            <source src="BTS.mp4">
-                            <source src="BTS.mp4">
-                        </video>
-
-                        <!-- Dark Gradient Overlay -->
                         <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
                             <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Left Motion Tag -->
-                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-cyan-300 font-semibold">
-                            <i class="ph-bold ph-sparkle text-brand-orange"></i>
-                            <span>SPEED RAMP • MOTION COMPOSITE</span>
-                        </div>
-
-                        <!-- Top Right Status Pill -->
                         <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
                             <span class="status-text text-neutral-200">MUTED • PAUSED</span>
                         </div>
-
-                        <!-- Bottom Metadata -->
                         <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
                             <div>
-                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
-                                    <i class="ph-bold ph-trend-up"></i>
-                                    <span>4K Cinema Grade + Riser SFX</span>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Brand Promo &amp; Visual FX</span>
-                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Meta Ninza — Tech &amp; Visual Showreel</h3>
-                                </div>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Family Film</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">6-Month Celebration Film</h3>
+                            </div>
+                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Pr + Ae</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
+                            <source src="BTS.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
+                        </div>
+                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                            <div>
+                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Behind the Scenes</span>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Creative Production BTS</h3>
                             </div>
                             <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">After Effects</span>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <!-- 2. VERTICAL VIDEOS (4 Short-Form 9:16 Reels/Shorts) -->
             <div class="saas-reveal mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
                     <i class="ph ph-device-mobile-camera text-brand-orange text-base"></i>
-                    <span>02 / High-Retention Vertical Reels + Before/After Results (9:16)</span>
+                    <span>02 / High-Retention Vertical Reels (9:16)</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="px-2.5 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange flex items-center gap-1.5">
                         <i class="ph-bold ph-sliders-horizontal"></i>
-                        <span>Interactive Raw vs. Edited Toggle &amp; Split Wipe</span>
+                        <span>Four Selected Short-Form Edits</span>
                     </span>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                <!-- Vertical Video Card 1 (Embedded Instagram Reel: DZQScuwSlMU) -->
-                <!-- TIP: To change to another Instagram Reel, just replace "DZQScuwSlMU" in the iframe src & link below with any Reel's ID! -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 0ms;">
+
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 0ms;" data-video-card>
                     <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <iframe 
-                            src="https://www.instagram.com/reel/DZQScuwSlMU/embed/" 
-                            class="w-full h-full border-0"
-                            allowtransparency="true" 
-                            allowfullscreen="true" 
-                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                            loading="lazy"
-                            title="Tejs Instagram Reel Showcase"
-                        ></iframe>
-
-                        <!-- Top Left Final Result Badge -->
-                        <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-emerald-500/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-black shadow-lg pointer-events-none">
-                            <i class="ph-fill ph-sparkle"></i>
-                            <span>FINAL REEL</span>
-                        </div>
-
-                        <!-- Top Right Instagram Badge + Direct Link -->
-                        <a 
-                            href="https://www.instagram.com/reel/DZQScuwSlMU/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill hover:bg-brand-orange px-2.5 py-1 rounded-full text-[10px] font-mono text-white transition"
-                        >
-                            <i class="ph-fill ph-instagram-logo text-xs"></i>
-                            <span>IG REEL</span>
-                            <i class="ph ph-arrow-up-right text-[10px]"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Vertical Video Card 2 (INTERACTIVE SPLIT-SCREEN BEFORE / AFTER WIPE REEL) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 90ms;" data-video-card data-ba-split-card>
-                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden select-none">
-                        <!-- Main Video (AFTER: Color Graded + VFX) -->
-                        <video 
-                            class="w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            
-                        >
-                            <source src="WhatsApp Video 2026-11-01 at 3.27.30 PM.mp4" type="video/mp4">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
+                            <source src="car_delivery.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Clipped Overlay Video (BEFORE: Flat Raw S-Log3 Camera Footage) -->
-                        <div class="ba-before-layer absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
-                            <video 
-                                class="ba-sync-video w-full h-full object-cover raw-footage-look" 
-                                loop 
-                                muted 
-                                playsinline 
-                                preload="metadata"
-                                
-                            >
-                                <source src="BURGERTOONS OPENING_1.mp4">
-                            </video>
-                            <!-- Raw Log Watermark Tag -->
-                            <div class="absolute top-14 left-3 bg-black/75 backdrop-blur-md border border-white/20 px-2 py-0.5 rounded text-[9px] font-mono text-neutral-300 uppercase tracking-widest">
-                                BEFORE • RAW LOG
-                            </div>
-                        </div>
-
-                        <!-- After Graded Tag -->
-                        <div class="absolute top-14 right-3 z-10 bg-brand-orange/90 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-mono text-white font-bold uppercase tracking-widest pointer-events-none">
-                            AFTER • GRADED
-                        </div>
-
-                        <!-- Vertical Split Divider Line & Handle -->
-                        <div class="ba-divider-line absolute top-0 bottom-0 w-[2px] bg-brand-orange z-20 pointer-events-none shadow-[0_0_12px_#E84A27]" style="left: 50%;">
-                            <div class="w-8 h-8 -ml-[15px] top-1/2 -translate-y-1/2 relative rounded-full ios-glass-pill border border-brand-orange text-white flex items-center justify-center shadow-xl">
-                                <i class="ph-bold ph-arrows-out-line-horizontal text-xs text-brand-orange"></i>
-                            </div>
-                        </div>
-
-                        <!-- Invisible Range Input for Dragging Split Wipe -->
-                        <input 
-                            type="range" 
-                            min="5" 
-                            max="95" 
-                            value="50" 
-                            aria-label="Before and After video comparison slider"
-                            class="ba-range-slider absolute inset-x-0 top-12 bottom-24 w-full h-[calc(100%-9rem)] z-30 opacity-0 cursor-ew-resize"
-                        />
-
-                        <!-- Play Overlay -->
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger pointer-events-auto w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300 mt-20">
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Left Mode Indicator -->
-                        <div class="absolute top-3 left-3 z-20 flex items-center gap-1 bg-black/80 backdrop-blur-md border border-brand-orange/40 px-2.5 py-1 rounded-full text-[10px] font-mono text-brand-orange">
-                            <i class="ph-bold ph-columns"></i>
-                            <span>DRAG SPLIT</span>
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED</span>
                         </div>
-
-                        <!-- Top Right Sound Status -->
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED</span>
-                        </div>
-
-                        <!-- Bottom Metadata + Impact Result Metric -->
-                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
-                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
-                                <i class="ph-bold ph-trend-up"></i>
-                                <span>Result: +240% Watch Time</span>
-                            </div>
-                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Pizzatoons</div>
-                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Color Grade, Speed Ramp &amp; SFX</h3>
-                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">Premiere Pro + Lumetri Color</p>
-                        </div>
+                    </div>
+                    <div class="px-2 pt-4 pb-3">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Automotive Film</span>
+                        <h3 class="text-base font-bold text-white mt-1">Luxury on the Move</h3>
+                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A cinematic automotive edit with dynamic framing, refined pacing and impactful sound design.</p>
                     </div>
                 </div>
 
-                <!-- Vertical Video Card 3 (BEFORE / AFTER INSTANT TOGGLE REEL) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card data-ba-toggle-card>
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 90ms;" data-video-card>
                     <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video 
-                            class="ba-target-video w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            poster="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
-                        >
-                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
+                            <source src="Lambo.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Before Raw Timecode HUD Overlay (Shown when "BEFORE" is active) -->
-                        <div class="ba-raw-hud hidden absolute inset-0 pointer-events-none z-10 border-2 border-dashed border-amber-400/50 m-3 rounded-xl flex flex-col justify-between p-3">
-                            <div class="flex justify-between items-center text-[9px] font-mono text-amber-300 bg-black/70 px-2 py-0.5 rounded self-start">
-                                <span>RAW_CAM_A01.MP4 • S-LOG3 • NO SFX</span>
-                            </div>
-                            <div class="text-center bg-black/75 backdrop-blur-sm py-1.5 px-3 rounded-lg border border-white/10 self-center mb-20">
-                                <span class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Unedited Camera Feed</span>
-                            </div>
-                        </div>
-
                         <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Left Interactive BEFORE / AFTER Switch Pill -->
-                        <div class="ba-switch-group absolute top-3 left-3 z-30 flex items-center p-0.5 rounded-full bg-black/85 backdrop-blur-md border border-white/20 text-[9px] font-mono">
-                            <button type="button" data-ba-mode="before" class="ba-btn px-2.5 py-1 rounded-full text-neutral-400 hover:text-white transition">
-                                BEFORE
-                            </button>
-                            <button type="button" data-ba-mode="after" class="ba-btn px-2.5 py-1 rounded-full bg-brand-orange text-white font-bold transition">
-                                AFTER
-                            </button>
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED</span>
                         </div>
-
-                        <!-- Top Right Sound Status -->
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED</span>
-                        </div>
-
-                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
-                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
-                                <i class="ph-bold ph-lightning"></i>
-                                <span>Result: 92% 3-Sec Hook Hold</span>
-                            </div>
-                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Sahib Kaur</div>
-                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Kinetic Captions &amp; Viral Hook</h3>
-                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">CapCut PC + After Effects</p>
-                        </div>
+                    </div>
+                    <div class="px-2 pt-4 pb-3">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Automotive Showcase</span>
+                        <h3 class="text-base font-bold text-white mt-1">Lamborghini — Pure Performance</h3>
+                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A high-energy supercar showcase built around bold visuals, smooth transitions and beat-synced cuts.</p>
                     </div>
                 </div>
 
-                <!-- Vertical Video Card 4 (BEFORE / AFTER INSTANT TOGGLE REEL) -->
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 270ms;" data-video-card data-ba-toggle-card>
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 180ms;" data-video-card>
                     <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video 
-                            class="ba-target-video w-full h-full object-cover graded-footage-look" 
-                            loop 
-                            muted 
-                            playsinline 
-                            preload="metadata"
-                            poster="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80"
-                        >
-                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
+                            <source src="real_estate.mp4" type="video/mp4">
                         </video>
-
-                        <!-- Before Raw Timecode HUD Overlay (Shown when "BEFORE" is active) -->
-                        <div class="ba-raw-hud hidden absolute inset-0 pointer-events-none z-10 border-2 border-dashed border-amber-400/50 m-3 rounded-xl flex flex-col justify-between p-3">
-                            <div class="flex justify-between items-center text-[9px] font-mono text-amber-300 bg-black/70 px-2 py-0.5 rounded self-start">
-                                <span>DRONE_DLOG_04.MOV • UNGRADED</span>
-                            </div>
-                            <div class="text-center bg-black/75 backdrop-blur-sm py-1.5 px-3 rounded-lg border border-white/10 self-center mb-20">
-                                <span class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Flat Drone Footage (Before Grade)</span>
-                            </div>
-                        </div>
-
                         <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
                             </button>
                         </div>
-
-                        <!-- Top Left Interactive BEFORE / AFTER Switch Pill -->
-                        <div class="ba-switch-group absolute top-3 left-3 z-30 flex items-center p-0.5 rounded-full bg-black/85 backdrop-blur-md border border-white/20 text-[9px] font-mono">
-                            <button type="button" data-ba-mode="before" class="ba-btn px-2.5 py-1 rounded-full text-neutral-400 hover:text-white transition">
-                                BEFORE
-                            </button>
-                            <button type="button" data-ba-mode="after" class="ba-btn px-2.5 py-1 rounded-full bg-brand-orange text-white font-bold transition">
-                                AFTER
-                            </button>
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED</span>
                         </div>
-
-                        <!-- Top Right Sound Status -->
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED</span>
-                        </div>
-
-                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
-                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
-                                <i class="ph-bold ph-Sparkle"></i>
-                                <span>Result: 3.4x Booking Inquiries</span>
-                            </div>
-                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Raksha Hospitality</div>
-                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Luxury Property Speed Ramp &amp; LUT</h3>
-                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">Premiere Pro + Color Grade</p>
-                        </div>
+                    </div>
+                    <div class="px-2 pt-4 pb-3">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Real Estate</span>
+                        <h3 class="text-base font-bold text-white mt-1">Spaces That Inspire</h3>
+                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A polished property film highlighting interiors, architectural details and the atmosphere of the space.</p>
                     </div>
                 </div>
 
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 270ms;" data-video-card>
+                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
+                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
+                            <source src="caption_reel.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED</span>
+                        </div>
+                    </div>
+                    <div class="px-2 pt-4 pb-3">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Social Media Reel</span>
+                        <h3 class="text-base font-bold text-white mt-1">Words That Make an Impact</h3>
+                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A fast-paced caption-led reel with clear typography, engaging rhythm and precise sound sync.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
