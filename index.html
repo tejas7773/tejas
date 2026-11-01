@@ -47,6 +47,88 @@
         .hero-title-blend {
             mix-blend-mode: difference;
             color: #ffffff;
+            will-change: transform;
+        }
+
+        /* 60FPS Kinetic Hero Typography Animation */
+        @keyframes charReveal60fps {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 115%, 0) rotateX(-65deg) scale(0.92);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0%, 0) rotateX(0deg) scale(1);
+                filter: blur(0px);
+            }
+        }
+
+        @keyframes heroFloat60fps {
+            0%, 100% {
+                transform: translate3d(0, 0px, 0);
+            }
+            50% {
+                transform: translate3d(0, -9px, 0);
+            }
+        }
+
+        .hero-char {
+            display: inline-block;
+            will-change: transform, opacity, filter;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+            transform-style: preserve-3d;
+            animation:
+                charReveal60fps 1.15s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--char-index) * 0.055s) both,
+                heroFloat60fps 4.8s ease-in-out calc(1.2s + var(--char-index) * 0.14s) infinite;
+        }
+
+        /* Before / After Footage Look Filters */
+        .raw-footage-look {
+            filter: saturate(32%) contrast(78%) brightness(106%) sepia(10%);
+        }
+        .graded-footage-look {
+            filter: saturate(122%) contrast(112%) brightness(101%);
+        }
+
+        /* Custom Dual-Circle Cursor CSS */
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background-color: #C8B282;
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate3d(-50%, -50%, 0);
+            transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease;
+        }
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 44px;
+            height: 44px;
+            border: 1.5px solid rgba(200, 178, 130, 0.65);
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate3d(-50%, -50%, 0);
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
+        }
+        body.cursor-hover .cursor-dot {
+            background-color: #E84A27;
+            width: 12px;
+            height: 12px;
+        }
+        body.cursor-hover .cursor-ring {
+            width: 64px;
+            height: 64px;
+            border-color: rgba(232, 74, 39, 0.85);
+            background-color: rgba(232, 74, 39, 0.08);
         }
 
         /* Editorial B&W Portrait Effect (knocks out white studio background into hero gray) */
@@ -109,105 +191,114 @@
         }
 
         /* ========================================== */
-        /* CUSTOM DUAL-CIRCLE CURSOR (Reference UI)   */
+        /* APPLE NEW LIQUID GLASS UI SYSTEM           */
         /* ========================================== */
-        @media (hover: hover) and (pointer: fine) {
-            body, a, button, input, select, textarea, [data-video-card], #timeline-scrubber {
-                cursor: none !important;
-            }
+        :root {
+            --liquid-mx: 50%;
+            --liquid-my: 50%;
         }
 
-        .cursor-dot {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            background-color: #C8B282; /* Warm gold-tan from reference image */
-            border-radius: 9999px;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease, transform 0.15s ease;
-        }
-
-        .cursor-ring {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 48px;
-            height: 48px;
-            border: 1.5px solid rgba(200, 178, 130, 0.55); /* Subtle outer ring from reference */
-            border-radius: 9999px;
-            pointer-events: none;
-            z-index: 9998;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        border-color 0.3s ease,
-                        background-color 0.3s ease;
-        }
-
-        /* Cursor Hover State on Interactive Elements */
-        body.cursor-hover .cursor-dot {
-            width: 12px;
-            height: 12px;
-            background-color: #E84A27;
-        }
-
-        body.cursor-hover .cursor-ring {
-            width: 68px;
-            height: 68px;
-            border-color: rgba(232, 74, 39, 0.85);
-            background-color: rgba(232, 74, 39, 0.12);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        /* ========================================== */
-        /* IPHONE / iOS FROSTED GLASSMORPHISM EFFECT  */
-        /* ========================================== */
-        .ios-glass {
+        .ios-glass,
+        .liquid-glass {
+            position: relative;
             background: linear-gradient(
                 135deg,
-                rgba(255, 255, 255, 0.10) 0%,
-                rgba(255, 255, 255, 0.03) 50%,
-                rgba(20, 20, 20, 0.65) 100%
+                rgba(255, 255, 255, 0.16) 0%,
+                rgba(255, 255, 255, 0.04) 45%,
+                rgba(255, 255, 255, 0.10) 100%
             );
-            backdrop-filter: blur(28px) saturate(190%);
-            -webkit-backdrop-filter: blur(28px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: url(#apple-liquid-refraction) blur(34px) saturate(230%) brightness(1.06);
+            -webkit-backdrop-filter: blur(34px) saturate(230%) brightness(1.06);
+            border: 1px solid rgba(255, 255, 255, 0.24);
             box-shadow:
-                0 24px 48px -12px rgba(0, 0, 0, 0.75),
-                inset 0 1px 1px 0 rgba(255, 255, 255, 0.28),
-                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05);
+                0 28px 60px -12px rgba(0, 0, 0, 0.78),
+                inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.55),
+                inset 0 -1.5px 2px 0 rgba(255, 255, 255, 0.14),
+                inset 1.5px 0 2px 0 rgba(255, 255, 255, 0.22);
+        }
+
+        /* Interactive specular liquid highlight that follows cursor */
+        .ios-glass::after,
+        .stack-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                480px circle at var(--liquid-mx, 50%) var(--liquid-my, 50%),
+                rgba(255, 255, 255, 0.16),
+                rgba(232, 74, 39, 0.06) 35%,
+                transparent 70%
+            );
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.3s ease;
         }
 
         .ios-glass-pill {
+            position: relative;
+            overflow: hidden;
             background: linear-gradient(
                 135deg,
-                rgba(255, 255, 255, 0.14) 0%,
-                rgba(255, 255, 255, 0.04) 100%
+                rgba(255, 255, 255, 0.19) 0%,
+                rgba(255, 255, 255, 0.05) 55%,
+                rgba(255, 255, 255, 0.12) 100%
             );
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(26px) saturate(220%) brightness(1.08);
+            -webkit-backdrop-filter: blur(26px) saturate(220%) brightness(1.08);
+            border: 1px solid rgba(255, 255, 255, 0.26);
             box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0.5px rgba(255, 255, 255, 0.3);
+                0 10px 28px rgba(0, 0, 0, 0.45),
+                inset 0 1.5px 1px rgba(255, 255, 255, 0.52),
+                inset 0 -1px 1px rgba(255, 255, 255, 0.12);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ios-glass-pill:hover {
+            transform: translateY(-1px) scale(1.01);
+            border-color: rgba(255, 255, 255, 0.42);
+            box-shadow:
+                0 14px 32px rgba(232, 74, 39, 0.2),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.72),
+                inset 0 -1px 1px rgba(232, 74, 39, 0.25);
+        }
+
+        /* Light-mode Liquid Glass Dock for Hero Navbar */
+        .liquid-glass-light {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.65) 0%,
+                rgba(255, 255, 255, 0.28) 50%,
+                rgba(255, 255, 255, 0.48) 100%
+            );
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow:
+                0 16px 36px rgba(0, 0, 0, 0.08),
+                inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.05);
         }
 
         .ios-glass-input {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.02) 100%
+            );
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow:
+                inset 0 1.5px 2px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0.5px rgba(255, 255, 255, 0.25);
         }
         .ios-glass-input:focus {
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.11);
             border-color: #E84A27;
-            box-shadow: 0 0 0 3px rgba(232, 74, 39, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 0 0 4px rgba(232, 74, 39, 0.22),
+                inset 0 1.5px 1px rgba(255, 255, 255, 0.45);
         }
 
         /* ========================================== */
@@ -228,26 +319,26 @@
                         filter 0.35s ease,
                         border-color 0.3s ease,
                         box-shadow 0.35s ease;
-            /* iPhone Translucent Frosted Glass Card Surface */
+            /* Apple Liquid Glass Card Surface */
             background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.11) 0%,
+                135deg,
+                rgba(255, 255, 255, 0.16) 0%,
                 rgba(255, 255, 255, 0.04) 45%,
-                rgba(18, 18, 18, 0.72) 100%
+                rgba(20, 20, 24, 0.62) 100%
             );
-            backdrop-filter: blur(32px) saturate(200%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: url(#apple-liquid-refraction) blur(36px) saturate(230%) brightness(1.06);
+            -webkit-backdrop-filter: blur(36px) saturate(230%) brightness(1.06);
+            border: 1px solid rgba(255, 255, 255, 0.26);
             box-shadow:
-                0 -18px 45px rgba(0, 0, 0, 0.8),
-                0 20px 40px rgba(0, 0, 0, 0.6),
-                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.32),
-                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.06);
+                0 -20px 48px rgba(0, 0, 0, 0.78),
+                0 24px 48px rgba(0, 0, 0, 0.65),
+                inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.55),
+                inset 0 -1.5px 1.5px 0 rgba(255, 255, 255, 0.12);
             will-change: transform;
             overflow: hidden;
         }
 
-        /* Subtle diagonal iPhone glass sheen reflection */
+        /* Subtle diagonal Apple Liquid Glass sheen reflection */
         .stack-card::before {
             content: "";
             position: absolute;
@@ -255,20 +346,103 @@
             left: -50%;
             width: 200%;
             height: 100%;
-            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 60%);
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.2), transparent 62%);
             pointer-events: none;
         }
 
         .stack-card:hover {
-            border-color: rgba(232, 74, 39, 0.65);
+            border-color: rgba(232, 74, 39, 0.75);
             box-shadow:
-                0 -18px 45px rgba(0, 0, 0, 0.85),
-                0 20px 50px rgba(232, 74, 39, 0.12),
-                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.42);
+                0 -20px 50px rgba(0, 0, 0, 0.85),
+                0 24px 55px rgba(232, 74, 39, 0.18),
+                inset 0 2px 2px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        /* ========================================== */
+        /* MODERN SAAS SCROLL REVEAL & 3D PERSPECTIVE */
+        /* ========================================== */
+        .saas-perspective-stage {
+            perspective: 1400px;
+        }
+
+        /* Standard SaaS Blur + Slide + Scale Reveal */
+        .saas-reveal {
+            opacity: 0;
+            transform: translate3d(0, 44px, 0) scale(0.96);
+            filter: blur(10px);
+            transition:
+                opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: var(--saas-delay, 0ms);
+            will-change: transform, opacity, filter;
+        }
+
+        .saas-reveal.is-inview {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0px);
+        }
+
+        /* SaaS 3D Dashboard-Style Tilt Card Reveal on Scroll */
+        .saas-3d-card {
+            opacity: 0;
+            transform: perspective(1200px) translate3d(0, 64px, -40px) rotateX(14deg) scale(0.94);
+            filter: blur(8px);
+            transform-origin: center bottom;
+            transition:
+                opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 1s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease;
+            transition-delay: var(--saas-delay, 0ms);
+            will-change: transform, opacity, filter;
+        }
+
+        .saas-3d-card.is-inview {
+            opacity: 1;
+            transform: perspective(1200px) translate3d(0, 0, 0) rotateX(0deg) scale(1);
+            filter: blur(0px);
+        }
+
+        .saas-3d-card.is-inview:hover {
+            transform: perspective(1200px) translate3d(0, -6px, 12px) rotateX(1.5deg) scale(1.01);
+        }
+
+        /* SaaS Glowing Horizon Section Divider Beam */
+        .saas-horizon-beam {
+            position: relative;
+            height: 1px;
+            width: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.14) 20%, rgba(232,74,39,0.75) 50%, rgba(255,255,255,0.14) 80%, transparent 100%);
+            overflow: visible;
+        }
+        .saas-horizon-beam::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 38%;
+            height: 5px;
+            background: radial-gradient(ellipse at center, rgba(232, 74, 39, 0.65) 0%, transparent 75%);
+            filter: blur(4px);
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="selection:bg-brand-orange selection:text-white">
+
+    <!-- Apple Liquid Glass SVG Optical Refraction Filter -->
+    <svg class="hidden" width="0" height="0" aria-hidden="true">
+        <defs>
+            <filter id="apple-liquid-refraction" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="7" result="liquidNoise" />
+                <feGaussianBlur in="liquidNoise" stdDeviation="2.5" result="smoothedNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="smoothedNoise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
 
     <!-- Custom Dual-Circle Cursor Elements (Hidden on touch devices) -->
     <div id="cursor-dot" class="cursor-dot hidden md:block"></div>
@@ -277,8 +451,8 @@
     <!-- ========================================== -->
     <!-- STICKY NLE EDITING TIMELINE SCROLL TRACKER -->
     <!-- ========================================== -->
-    <div class="fixed top-0 left-0 w-full z-50 bg-black/55 backdrop-blur-2xl saturate-150 border-b border-white/15 select-none shadow-[0_10px_30px_rgba(0,0,0,0.65)]">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-3 text-[11px] font-mono">
+    <div class="fixed top-2 left-1/2 -translate-x-1/2 w-[96%] max-w-7xl z-50 ios-glass rounded-2xl select-none">
+        <div class="px-3 sm:px-5 h-11 flex items-center justify-between gap-3 text-[11px] font-mono">
             
             <!-- Left: Live Timecode & REC Indicator -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -328,25 +502,28 @@
     <!-- ========================================== -->
     <!-- HERO SECTION (Light Gray Reference Layout) -->
     <!-- ========================================== -->
-    <header class="relative bg-[#E6E6E6] text-[#111111] pt-14 min-h-[90vh] flex flex-col justify-between overflow-hidden">
+    <header class="relative bg-[#E6E6E6] text-[#111111] pt-16 min-h-[90vh] flex flex-col justify-between overflow-hidden">
         
-        <!-- Top Navigation Bar (Matches Reference) -->
-        <nav class="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between text-xs sm:text-sm font-medium tracking-tight z-30">
-            <a href="#" class="font-semibold hover:opacity-70 transition">© Tejs Visuals &amp; Edit</a>
-            <div class="flex items-center gap-6 sm:gap-16">
+        <!-- Top Navigation Bar (Apple Liquid Glass Capsule Dock) -->
+        <nav class="w-[94%] max-w-7xl mx-auto mt-2 px-5 py-3 rounded-full liquid-glass-light flex items-center justify-between text-xs sm:text-sm font-medium tracking-tight z-30">
+            <a href="#" class="font-semibold hover:opacity-70 transition flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-orange"></span>
+                <span>© Tejs Visuals &amp; Edit</span>
+            </a>
+            <div class="flex items-center gap-5 sm:gap-12">
                 <a href="#work" class="hover:text-brand-orange transition">Projects</a>
                 <a href="#about" class="hover:text-brand-orange transition">About</a>
                 <a href="#reviews" class="hidden sm:inline-block hover:text-brand-orange transition">Reviews</a>
-                <a href="#contact" class="hover:text-brand-orange transition font-semibold">Contact</a>
+                <a href="#contact" class="px-3.5 py-1.5 rounded-full bg-black/85 text-white hover:bg-brand-orange transition font-semibold text-xs">Contact</a>
             </div>
         </nav>
 
         <!-- Center Editorial Portrait & Giant Overlapping Name -->
-        <div class="relative flex-1 flex items-center justify-center my-auto py-8 sm:py-0">
+        <div id="hero-stage" class="relative flex-1 flex items-center justify-center my-auto py-8 sm:py-0" style="perspective: 1200px;">
             
-            <!-- Giant Typography (Spans full width, blends with portrait) -->
-            <h1 class="hero-title-blend relative z-20 text-[18vw] sm:text-[15.5vw] font-extrabold tracking-tighter leading-none select-none text-center w-full pointer-events-none">
-                Tejs Edits
+            <!-- Giant 60FPS Animated Typography (Spans full width, blends with portrait) -->
+            <h1 id="hero-kinetic-title" aria-label="Tejs Edits" class="hero-title-blend relative z-20 text-[18vw] sm:text-[15.5vw] font-extrabold tracking-tighter leading-none select-none text-center w-full pointer-events-none flex items-center justify-center">
+                <span class="hero-char" style="--char-index: 0;">T</span><span class="hero-char" style="--char-index: 1;">e</span><span class="hero-char" style="--char-index: 2;">j</span><span class="hero-char" style="--char-index: 3;">s</span><span class="inline-block w-[3.5vw]"></span><span class="hero-char" style="--char-index: 4;">E</span><span class="hero-char" style="--char-index: 5;">d</span><span class="hero-char" style="--char-index: 6;">i</span><span class="hero-char" style="--char-index: 7;">t</span><span class="hero-char" style="--char-index: 8;">s</span>
             </h1>
 
             <!-- Center Landscape Portrait Container (No inner overflow/transform so mix-blend-mode: multiply blends directly with #E6E6E6 header) -->
@@ -399,17 +576,22 @@
     <!-- ========================================== -->
     <!-- INTRO / ABOUT SECTION (Dark Reference UI)  -->
     <!-- ========================================== -->
-    <section id="about" class="bg-brand-dark bg-grain py-20 sm:py-28 px-6 border-b border-white/10">
-        <div class="max-w-7xl mx-auto">
+    <div class="saas-horizon-beam"></div>
+    <section id="about" class="saas-perspective-stage relative bg-brand-dark bg-grain py-20 sm:py-28 px-6 border-b border-white/10 overflow-hidden">
+        <!-- Ambient Liquid Glass Backlight Orbs (Scroll Parallax Driven) -->
+        <div data-saas-parallax="-0.12" class="pointer-events-none absolute -top-20 left-1/4 w-96 h-96 rounded-full bg-brand-orange/15 blur-[130px] will-change-transform"></div>
+        <div data-saas-parallax="0.15" class="pointer-events-none absolute bottom-0 right-10 w-80 h-80 rounded-full bg-indigo-500/15 blur-[120px] will-change-transform"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
             
             <!-- Section Tag -->
-            <div class="text-brand-orange font-mono text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+            <div class="saas-reveal text-brand-orange font-mono text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
                 <span>// Intro</span>
                 <span class="h-[1px] w-10 bg-brand-orange/40"></span>
             </div>
 
             <!-- Clean, Short & Professional Dual-Color Statement -->
-            <h2 class="text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.2] max-w-5xl">
+            <h2 class="saas-reveal text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.2] max-w-5xl" style="--saas-delay: 80ms;">
                 I’m <span class="text-white">Tejs</span>, a <span class="text-brand-orange">video editor &amp; cinematographer from Washim, Maharashtra</span> crafting high-retention stories, sharp visuals, and clean cuts for brands and creators.
             </h2>
 
@@ -418,10 +600,10 @@
                 
                 <!-- Left Software Badges -->
                 <div class="lg:col-span-7 flex flex-col gap-3.5">
-                    <p class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Primary Editing Suite</p>
+                    <p class="saas-reveal text-[11px] font-mono uppercase tracking-wider text-neutral-400" style="--saas-delay: 120ms;">Primary Editing Suite</p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <!-- Premiere Pro -->
-                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 160ms;">
                             <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Pr</span>
                             <div class="min-w-0">
                                 <div class="text-xs font-semibold text-white truncate">Premiere Pro</div>
@@ -429,7 +611,7 @@
                             </div>
                         </div>
                         <!-- After Effects -->
-                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 240ms;">
                             <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Ae</span>
                             <div class="min-w-0">
                                 <div class="text-xs font-semibold text-white truncate">After Effects</div>
@@ -437,7 +619,7 @@
                             </div>
                         </div>
                         <!-- CapCut PC -->
-                        <div class="flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl">
+                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 320ms;">
                             <span class="w-9 h-9 shrink-0 rounded-xl bg-white text-black flex items-center justify-center font-extrabold text-[11px] shadow-inner">CC</span>
                             <div class="min-w-0">
                                 <div class="text-xs font-semibold text-white truncate">CapCut PC</div>
@@ -448,7 +630,7 @@
                 </div>
 
                 <!-- Right Sub-paragraph & CTA Pill -->
-                <div class="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-5 lg:pl-6 lg:border-l lg:border-white/10">
+                <div class="saas-reveal lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-5 lg:pl-6 lg:border-l lg:border-white/10" style="--saas-delay: 260ms;">
                     <p class="text-neutral-300 text-sm leading-relaxed max-w-md">
                         From commercial films and wedding cinema to viral Reels—delivering polished, impactful edits with fast turnaround.
                     </p>
@@ -463,13 +645,18 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- SELECTED WORK (2 HORIZONTAL + 4 VERTICAL)  -->
+    <!-- SELECTED WORK (4 HORIZONTAL + 4 VERTICAL)  -->
     <!-- ========================================== -->
-    <section id="work" class="py-24 sm:py-32 px-6 bg-[#0A0A0A] border-b border-white/10">
-        <div class="max-w-7xl mx-auto">
+    <div class="saas-horizon-beam"></div>
+    <section id="work" class="saas-perspective-stage relative py-24 sm:py-32 px-6 bg-[#0A0A0A] border-b border-white/10 overflow-hidden">
+        <!-- Ambient Liquid Glass Backlight Orbs for Work Section -->
+        <div data-saas-parallax="0.18" class="pointer-events-none absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-brand-orange/15 blur-[140px] will-change-transform"></div>
+        <div data-saas-parallax="-0.16" class="pointer-events-none absolute bottom-1/4 -right-20 w-96 h-96 rounded-full bg-cyan-500/10 blur-[140px] will-change-transform"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
             
             <!-- Section Header -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div class="saas-reveal flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
                 <div>
                     <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3">
                         // Timeline Masterpieces
@@ -483,22 +670,25 @@
                 </div>
             </div>
 
-            <!-- 1. HORIZONTAL VIDEOS (2 Long-Form 16:9 Showcases) -->
-            <div class="mb-6 flex items-center justify-between">
+            <!-- 1. HORIZONTAL VIDEOS (4 Long-Form 16:9 Showcases) -->
+            <div class="saas-reveal mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
                     <i class="ph ph-monitor-play text-brand-orange text-base"></i>
-                    <span>01 / Horizontal Widescreen Edits (16:9)</span>
+                    <span>01 / Horizontal Widescreen Edits + Gaming &amp; Brand Showcases (16:9)</span>
                 </div>
-                <span class="text-xs font-mono text-neutral-500">1920 × 1080 • 60 FPS</span>
+                <span class="px-3 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange self-start sm:self-auto">
+                    4 Showcases • 1920 × 1080 • 60 FPS
+                </span>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-20">
                 
-                <!-- Horizontal Video Card 1 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
-                    <div class="relative aspect-video w-full bg-black overflow-hidden">
+                <!-- Horizontal Video Card 1 (INTERACTIVE BEFORE / AFTER SPLIT-SCREEN WIPE: Cinematic Brand Story & Sound Design) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 0ms;" data-video-card data-ba-split-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden select-none">
+                        <!-- Main Video (AFTER: Color Graded + Sound Design Master) -->
                         <video 
-                            class="w-full h-full object-cover" 
+                            class="w-full h-full object-cover graded-footage-look" 
                             loop 
                             muted 
                             playsinline 
@@ -509,34 +699,87 @@
                             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
                         </video>
 
+                        <!-- Clipped Overlay Video (BEFORE: Flat Raw S-Log3 Camera Footage) -->
+                        <div class="ba-before-layer absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
+                            <video 
+                                class="ba-sync-video w-full h-full object-cover raw-footage-look" 
+                                loop 
+                                muted 
+                                playsinline 
+                                preload="metadata"
+                                poster="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80"
+                            >
+                                <source src="https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-308-large.mp4" type="video/mp4">
+                                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                            </video>
+                            <!-- Raw Log Watermark Tag -->
+                            <div class="absolute top-14 left-4 ios-glass-pill px-2.5 py-1 rounded-full text-[9px] font-mono text-neutral-200 uppercase tracking-widest">
+                                BEFORE • RAW S-LOG3 (NO SFX)
+                            </div>
+                        </div>
+
+                        <!-- After Graded Tag -->
+                        <div class="absolute top-14 right-4 z-10 bg-brand-orange/90 backdrop-blur-xl border border-white/30 px-2.5 py-1 rounded-full text-[9px] font-mono text-white font-bold uppercase tracking-widest pointer-events-none shadow-lg">
+                            AFTER • GRADED + SFX MASTER
+                        </div>
+
+                        <!-- Vertical Split Divider Line & Liquid Glass Handle -->
+                        <div class="ba-divider-line absolute top-0 bottom-0 w-[2px] bg-white/90 z-20 pointer-events-none shadow-[0_0_16px_#E84A27]" style="left: 50%;">
+                            <div class="w-9 h-9 -ml-[17px] top-1/2 -translate-y-1/2 relative rounded-full ios-glass-pill border border-white/60 text-white flex items-center justify-center shadow-2xl">
+                                <i class="ph-bold ph-arrows-out-line-horizontal text-xs text-brand-orange"></i>
+                            </div>
+                        </div>
+
+                        <!-- Invisible Range Input for Dragging Split Wipe -->
+                        <input 
+                            type="range" 
+                            min="5" 
+                            max="95" 
+                            value="50" 
+                            aria-label="Before and After comparison slider for Cinematic Brand Story"
+                            class="ba-range-slider absolute inset-x-0 top-12 bottom-20 w-full h-[calc(100%-8rem)] z-30 opacity-0 cursor-ew-resize"
+                        />
+
                         <!-- Dark Gradient Overlay -->
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <!-- Center Play / Tap Button (Visible when paused or on mobile) -->
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                            <!-- Center Play / Tap Button -->
+                            <button type="button" aria-label="Play video with sound" class="play-trigger pointer-events-auto w-14 h-14 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300 ml-24">
+                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
 
+                        <!-- Top Left Drag Split Indicator -->
+                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-brand-orange font-semibold">
+                            <i class="ph-bold ph-columns"></i>
+                            <span>DRAG BEFORE / AFTER</span>
+                        </div>
+
                         <!-- Top Right Status Pill -->
-                        <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED • PAUSED</span>
+                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
                         </div>
 
                         <!-- Bottom Metadata -->
-                        <div class="absolute bottom-4 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
                             <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Commercial Documentary</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Cinematic Brand Story &amp; Sound Design</h3>
+                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
+                                    <i class="ph-bold ph-waveform"></i>
+                                    <span>Result: Full 5.1 SFX + Cinema Grade</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Commercial Documentary</span>
+                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Cinematic Brand Story &amp; Sound Design</h3>
+                                </div>
                             </div>
-                            <span class="text-xs font-mono text-white/70 bg-black/60 px-2 py-1 rounded">Pr + Ae</span>
+                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Pr + Ae</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Horizontal Video Card 2 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
-                    <div class="relative aspect-video w-full bg-black overflow-hidden">
+                <!-- Horizontal Video Card 2 (Liquid Glass Frame) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 120ms;" data-video-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
                         <video 
                             class="w-full h-full object-cover" 
                             loop 
@@ -550,24 +793,126 @@
 
                         <!-- Dark Gradient Overlay -->
                         <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
 
                         <!-- Top Right Status Pill -->
-                        <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
-                            <span class="status-text text-neutral-300">MUTED • PAUSED</span>
+                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
                         </div>
 
                         <!-- Bottom Metadata -->
-                        <div class="absolute bottom-4 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
                             <div>
                                 <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Luxury Wedding &amp; Event</span>
                                 <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Wedprisam — Royal Wedding Aftermovie</h3>
                             </div>
-                            <span class="text-xs font-mono text-white/70 bg-black/60 px-2 py-1 rounded">Premiere Pro</span>
+                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Premiere Pro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Video Card 3 (Gaming Videos Edits - 60FPS Montage, Velocity, 3D HUD & SFX) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 80ms;" data-video-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover graded-footage-look" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1000&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4" type="video/mp4">
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        </video>
+
+                        <!-- Dark Gradient Overlay -->
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play gaming video edit with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <!-- Top Left FPS / Beat Sync Badge -->
+                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-emerald-300 font-semibold">
+                            <i class="ph-fill ph-game-controller text-brand-orange text-xs"></i>
+                            <span>240FPS VELOCITY • BEAT SYNC</span>
+                        </div>
+
+                        <!-- Top Right Status Pill -->
+                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
+                        </div>
+
+                        <!-- Bottom Metadata -->
+                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
+                                    <i class="ph-bold ph-lightning"></i>
+                                    <span>3D Camera Track + Shake &amp; Saber VFX</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Esports &amp; Gaming Montage</span>
+                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Gaming Videos Edits</h3>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Ae + Pr + CC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Video Card 4 (High-Energy Commercial & Motion VFX Showreel) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card>
+                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover graded-footage-look" 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="metadata"
+                            poster="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1000&q=80"
+                        >
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
+                        </video>
+
+                        <!-- Dark Gradient Overlay -->
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
+                            </button>
+                        </div>
+
+                        <!-- Top Left Motion Tag -->
+                        <div class="absolute top-3.5 left-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-cyan-300 font-semibold">
+                            <i class="ph-bold ph-sparkle text-brand-orange"></i>
+                            <span>SPEED RAMP • MOTION COMPOSITE</span>
+                        </div>
+
+                        <!-- Top Right Status Pill -->
+                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
+                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
+                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
+                        </div>
+
+                        <!-- Bottom Metadata -->
+                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 ios-glass-pill text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono mb-1.5">
+                                    <i class="ph-bold ph-trend-up"></i>
+                                    <span>4K Cinema Grade + Riser SFX</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Brand Promo &amp; Visual FX</span>
+                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Meta Ninza — Tech &amp; Visual Showreel</h3>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">After Effects</span>
                         </div>
                     </div>
                 </div>
@@ -575,20 +920,25 @@
             </div>
 
             <!-- 2. VERTICAL VIDEOS (4 Short-Form 9:16 Reels/Shorts) -->
-            <div class="mb-6 flex items-center justify-between">
+            <div class="saas-reveal mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
                     <i class="ph ph-device-mobile-camera text-brand-orange text-base"></i>
-                    <span>02 / High-Retention Vertical Reels &amp; Shorts (9:16)</span>
+                    <span>02 / High-Retention Vertical Reels + Before/After Results (9:16)</span>
                 </div>
-                <span class="text-xs font-mono text-neutral-500">1080 × 1920 • Instagram Reels &amp; MP4</span>
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange flex items-center gap-1.5">
+                        <i class="ph-bold ph-sliders-horizontal"></i>
+                        <span>Interactive Raw vs. Edited Toggle &amp; Split Wipe</span>
+                    </span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 <!-- Vertical Video Card 1 (Embedded Instagram Reel: DZQScuwSlMU) -->
                 <!-- TIP: To change to another Instagram Reel, just replace "DZQScuwSlMU" in the iframe src & link below with any Reel's ID! -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10 flex flex-col">
-                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 0ms;">
+                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
                         <iframe 
                             src="https://www.instagram.com/reel/DZQScuwSlMU/embed/" 
                             class="w-full h-full border-0"
@@ -599,12 +949,18 @@
                             title="Tejs Instagram Reel Showcase"
                         ></iframe>
 
+                        <!-- Top Left Final Result Badge -->
+                        <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-emerald-500/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-black shadow-lg pointer-events-none">
+                            <i class="ph-fill ph-sparkle"></i>
+                            <span>FINAL REEL</span>
+                        </div>
+
                         <!-- Top Right Instagram Badge + Direct Link -->
                         <a 
                             href="https://www.instagram.com/reel/DZQScuwSlMU/" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/80 hover:bg-brand-orange backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono text-white transition"
+                            class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill hover:bg-brand-orange px-2.5 py-1 rounded-full text-[10px] font-mono text-white transition"
                         >
                             <i class="ph-fill ph-instagram-logo text-xs"></i>
                             <span>IG REEL</span>
@@ -613,11 +969,12 @@
                     </div>
                 </div>
 
-                <!-- Vertical Video Card 2 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                <!-- Vertical Video Card 2 (INTERACTIVE SPLIT-SCREEN BEFORE / AFTER WIPE REEL) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 90ms;" data-video-card data-ba-split-card>
+                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden select-none">
+                        <!-- Main Video (AFTER: Color Graded + VFX) -->
                         <video 
-                            class="w-full h-full object-cover" 
+                            class="w-full h-full object-cover graded-footage-look" 
                             loop 
                             muted 
                             playsinline 
@@ -627,30 +984,83 @@
                             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4" type="video/mp4">
                         </video>
 
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
+                        <!-- Clipped Overlay Video (BEFORE: Flat Raw S-Log3 Camera Footage) -->
+                        <div class="ba-before-layer absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
+                            <video 
+                                class="ba-sync-video w-full h-full object-cover raw-footage-look" 
+                                loop 
+                                muted 
+                                playsinline 
+                                preload="metadata"
+                                poster="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80"
+                            >
+                                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4" type="video/mp4">
+                            </video>
+                            <!-- Raw Log Watermark Tag -->
+                            <div class="absolute top-14 left-3 bg-black/75 backdrop-blur-md border border-white/20 px-2 py-0.5 rounded text-[9px] font-mono text-neutral-300 uppercase tracking-widest">
+                                BEFORE • RAW LOG
+                            </div>
+                        </div>
+
+                        <!-- After Graded Tag -->
+                        <div class="absolute top-14 right-3 z-10 bg-brand-orange/90 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-mono text-white font-bold uppercase tracking-widest pointer-events-none">
+                            AFTER • GRADED
+                        </div>
+
+                        <!-- Vertical Split Divider Line & Handle -->
+                        <div class="ba-divider-line absolute top-0 bottom-0 w-[2px] bg-brand-orange z-20 pointer-events-none shadow-[0_0_12px_#E84A27]" style="left: 50%;">
+                            <div class="w-8 h-8 -ml-[15px] top-1/2 -translate-y-1/2 relative rounded-full ios-glass-pill border border-brand-orange text-white flex items-center justify-center shadow-xl">
+                                <i class="ph-bold ph-arrows-out-line-horizontal text-xs text-brand-orange"></i>
+                            </div>
+                        </div>
+
+                        <!-- Invisible Range Input for Dragging Split Wipe -->
+                        <input 
+                            type="range" 
+                            min="5" 
+                            max="95" 
+                            value="50" 
+                            aria-label="Before and After video comparison slider"
+                            class="ba-range-slider absolute inset-x-0 top-12 bottom-24 w-full h-[calc(100%-9rem)] z-30 opacity-0 cursor-ew-resize"
+                        />
+
+                        <!-- Play Overlay -->
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                            <button type="button" aria-label="Play vertical reel" class="play-trigger pointer-events-auto w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300 mt-20">
+                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
                             </button>
                         </div>
 
+                        <!-- Top Left Mode Indicator -->
+                        <div class="absolute top-3 left-3 z-20 flex items-center gap-1 bg-black/80 backdrop-blur-md border border-brand-orange/40 px-2.5 py-1 rounded-full text-[10px] font-mono text-brand-orange">
+                            <i class="ph-bold ph-columns"></i>
+                            <span>DRAG SPLIT</span>
+                        </div>
+
+                        <!-- Top Right Sound Status -->
                         <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
                             <span class="status-text text-neutral-300">MUTED</span>
                         </div>
 
-                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Pizzatoons</span>
-                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Fast-Cut Food Commercial &amp; SFX</h3>
-                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">Premiere Pro + SFX</p>
+                        <!-- Bottom Metadata + Impact Result Metric -->
+                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
+                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
+                                <i class="ph-bold ph-trend-up"></i>
+                                <span>Result: +240% Watch Time</span>
+                            </div>
+                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Pizzatoons</div>
+                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Color Grade, Speed Ramp &amp; SFX</h3>
+                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">Premiere Pro + Lumetri Color</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Vertical Video Card 3 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                <!-- Vertical Video Card 3 (BEFORE / AFTER INSTANT TOGGLE REEL) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card data-ba-toggle-card>
+                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
                         <video 
-                            class="w-full h-full object-cover" 
+                            class="ba-target-video w-full h-full object-cover graded-footage-look" 
                             loop 
                             muted 
                             playsinline 
@@ -660,30 +1070,55 @@
                             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
                         </video>
 
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                        <!-- Before Raw Timecode HUD Overlay (Shown when "BEFORE" is active) -->
+                        <div class="ba-raw-hud hidden absolute inset-0 pointer-events-none z-10 border-2 border-dashed border-amber-400/50 m-3 rounded-xl flex flex-col justify-between p-3">
+                            <div class="flex justify-between items-center text-[9px] font-mono text-amber-300 bg-black/70 px-2 py-0.5 rounded self-start">
+                                <span>RAW_CAM_A01.MP4 • S-LOG3 • NO SFX</span>
+                            </div>
+                            <div class="text-center bg-black/75 backdrop-blur-sm py-1.5 px-3 rounded-lg border border-white/10 self-center mb-20">
+                                <span class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Unedited Camera Feed</span>
+                            </div>
+                        </div>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
                             <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
 
+                        <!-- Top Left Interactive BEFORE / AFTER Switch Pill -->
+                        <div class="ba-switch-group absolute top-3 left-3 z-30 flex items-center p-0.5 rounded-full bg-black/85 backdrop-blur-md border border-white/20 text-[9px] font-mono">
+                            <button type="button" data-ba-mode="before" class="ba-btn px-2.5 py-1 rounded-full text-neutral-400 hover:text-white transition">
+                                BEFORE
+                            </button>
+                            <button type="button" data-ba-mode="after" class="ba-btn px-2.5 py-1 rounded-full bg-brand-orange text-white font-bold transition">
+                                AFTER
+                            </button>
+                        </div>
+
+                        <!-- Top Right Sound Status -->
                         <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
                             <span class="status-text text-neutral-300">MUTED</span>
                         </div>
 
-                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Sahib Kaur</span>
-                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Creator Lifestyle &amp; Kinetic Captions</h3>
-                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">CapCut PC + After Effects</p>
+                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
+                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
+                                <i class="ph-bold ph-lightning"></i>
+                                <span>Result: 92% 3-Sec Hook Hold</span>
+                            </div>
+                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Sahib Kaur</div>
+                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Kinetic Captions &amp; Viral Hook</h3>
+                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">CapCut PC + After Effects</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Vertical Video Card 4 -->
-                <div class="video-card group relative rounded-2xl overflow-hidden bg-brand-card border border-white/10" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black overflow-hidden">
+                <!-- Vertical Video Card 4 (BEFORE / AFTER INSTANT TOGGLE REEL) -->
+                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 270ms;" data-video-card data-ba-toggle-card>
+                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
                         <video 
-                            class="w-full h-full object-cover" 
+                            class="ba-target-video w-full h-full object-cover graded-footage-look" 
                             loop 
                             muted 
                             playsinline 
@@ -693,21 +1128,46 @@
                             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
                         </video>
 
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
+                        <!-- Before Raw Timecode HUD Overlay (Shown when "BEFORE" is active) -->
+                        <div class="ba-raw-hud hidden absolute inset-0 pointer-events-none z-10 border-2 border-dashed border-amber-400/50 m-3 rounded-xl flex flex-col justify-between p-3">
+                            <div class="flex justify-between items-center text-[9px] font-mono text-amber-300 bg-black/70 px-2 py-0.5 rounded self-start">
+                                <span>DRONE_DLOG_04.MOV • UNGRADED</span>
+                            </div>
+                            <div class="text-center bg-black/75 backdrop-blur-sm py-1.5 px-3 rounded-lg border border-white/10 self-center mb-20">
+                                <span class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Flat Drone Footage (Before Grade)</span>
+                            </div>
+                        </div>
+
+                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
                             <button type="button" aria-label="Play vertical reel" class="play-trigger w-14 h-14 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
                                 <i class="ph-fill ph-play text-xl ml-0.5 icon-state"></i>
                             </button>
                         </div>
 
+                        <!-- Top Left Interactive BEFORE / AFTER Switch Pill -->
+                        <div class="ba-switch-group absolute top-3 left-3 z-30 flex items-center p-0.5 rounded-full bg-black/85 backdrop-blur-md border border-white/20 text-[9px] font-mono">
+                            <button type="button" data-ba-mode="before" class="ba-btn px-2.5 py-1 rounded-full text-neutral-400 hover:text-white transition">
+                                BEFORE
+                            </button>
+                            <button type="button" data-ba-mode="after" class="ba-btn px-2.5 py-1 rounded-full bg-brand-orange text-white font-bold transition">
+                                AFTER
+                            </button>
+                        </div>
+
+                        <!-- Top Right Sound Status -->
                         <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-[10px] font-mono">
                             <i class="ph-fill ph-speaker-slash text-neutral-400 sound-icon"></i>
                             <span class="status-text text-neutral-300">MUTED</span>
                         </div>
 
-                        <div class="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-                            <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Raksha Hospitality</span>
-                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">Luxury Resort Property Tour &amp; Speed Ramp</h3>
-                            <p class="text-[11px] text-neutral-400 mt-1 font-mono">Premiere Pro + Color Grade</p>
+                        <div class="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
+                            <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-md text-[10px] font-mono mb-1.5">
+                                <i class="ph-bold ph-Sparkle"></i>
+                                <span>Result: 3.4x Booking Inquiries</span>
+                            </div>
+                            <div class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Raksha Hospitality</div>
+                            <h3 class="text-sm sm:text-base font-bold text-white leading-snug">Luxury Property Speed Ramp &amp; LUT</h3>
+                            <p class="text-[10px] text-neutral-400 mt-0.5 font-mono">Premiere Pro + Color Grade</p>
                         </div>
                     </div>
                 </div>
@@ -720,6 +1180,7 @@
     <!-- CLIENT FEEDBACK / TESTIMONIALS SECTION     -->
     <!-- (STICKY SCROLL STACKING CARDS EFFECT)      -->
     <!-- ========================================== -->
+    <div class="saas-horizon-beam"></div>
     <section id="reviews" class="relative py-24 sm:py-32 px-6 bg-brand-dark bg-grain border-b border-white/10">
         <!-- Ambient iOS Backlight Orbs (Makes the iPhone Frosted Glass Blur Pop as Cards Stack) -->
         <div class="pointer-events-none absolute inset-0 overflow-hidden">
@@ -733,7 +1194,7 @@
         <div class="relative z-10 max-w-7xl mx-auto">
             
             <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div class="saas-reveal flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                 <div>
                     <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2.5">
                         <span>// Client Endorsements</span>
@@ -924,17 +1385,18 @@
     <!-- ========================================== -->
     <!-- CONTACT / WHATSAPP REDIRECT FORM SECTION   -->
     <!-- ========================================== -->
-    <section id="contact" class="py-24 sm:py-32 px-6 bg-[#0A0A0A] relative overflow-hidden">
+    <div class="saas-horizon-beam"></div>
+    <section id="contact" class="saas-perspective-stage py-24 sm:py-32 px-6 bg-[#0A0A0A] relative overflow-hidden">
         <!-- Ambient Glow Behind iPhone Glass Contact Card -->
-        <div class="pointer-events-none absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-brand-orange/20 blur-[130px]"></div>
-        <div class="pointer-events-none absolute top-16 left-10 w-80 h-80 rounded-full bg-indigo-500/10 blur-[120px]"></div>
+        <div data-saas-parallax="-0.14" class="pointer-events-none absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-brand-orange/20 blur-[130px] will-change-transform"></div>
+        <div data-saas-parallax="0.14" class="pointer-events-none absolute top-16 left-10 w-80 h-80 rounded-full bg-indigo-500/10 blur-[120px] will-change-transform"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto">
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-stretch">
                 
                 <!-- Left Column: Callout & Direct Info -->
-                <div class="lg:col-span-5 flex flex-col justify-between space-y-8">
+                <div class="saas-reveal lg:col-span-5 flex flex-col justify-between space-y-8">
                     <div>
                         <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
                             <span>// Start a Project</span>
@@ -989,7 +1451,7 @@
                 </div>
 
                 <!-- Right Column: WhatsApp Lead Form (iPhone Frosted Glass Panel) -->
-                <div class="lg:col-span-7 ios-glass p-6 sm:p-10 rounded-[32px] flex flex-col justify-between">
+                <div class="saas-3d-card lg:col-span-7 ios-glass p-6 sm:p-10 rounded-[32px] flex flex-col justify-between" style="--saas-delay: 140ms;">
                     <div class="mb-6 pb-4 border-b border-white/10 flex items-center justify-between">
                         <div>
                             <h3 class="text-lg sm:text-xl font-bold text-white">Project Inquiry Form</h3>
@@ -1085,7 +1547,7 @@
                         <!-- Submit to WhatsApp Button -->
                         <button 
                             type="submit" 
-                            class="w-full h-14 bg-brand-orange hover:bg-[#ff5733] text-white font-bold px-6 rounded-2xl flex items-center justify-center gap-3 transition duration-300 shadow-lg shadow-brand-orange/25"
+                            class="w-full h-14 ios-glass-pill bg-brand-orange/90 hover:bg-brand-orange text-white font-bold px-6 rounded-2xl flex items-center justify-center gap-3 transition duration-300 shadow-lg shadow-brand-orange/30"
                         >
                             <i class="ph-fill ph-whatsapp-logo text-xl"></i>
                             <span>Send Inquiry to Tejs on WhatsApp</span>
@@ -1105,9 +1567,9 @@
 
     <!-- Footer -->
     <footer class="bg-[#060606] border-t border-white/10 py-8 px-6 text-xs text-neutral-500">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>© 2026 Tejs — Video Editor (Washim, Maharashtra). All rights reserved.</div>
-            <div class="font-mono text-neutral-400">Adobe Premiere Pro • After Effects • CapCut PC</div>
+        <div class="max-w-7xl mx-auto ios-glass-pill px-6 py-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-neutral-300">© 2026 Tejs — Video Editor &amp; Cinematographer (Washim, Maharashtra). All rights reserved.</div>
+            <div class="font-mono text-brand-orange">Adobe Premiere Pro • After Effects • CapCut PC</div>
         </div>
     </footer>
 
@@ -1115,6 +1577,47 @@
     <!-- INTERACTIVE SCRIPTS                        -->
     <!-- ========================================== -->
     <script>
+        // 0A. 60FPS KINETIC HERO TITLE PARALLAX ("Tejs Edits")
+        const heroStage = document.getElementById('hero-stage');
+        const heroKineticTitle = document.getElementById('hero-kinetic-title');
+
+        if (heroStage && heroKineticTitle) {
+            let targetTitleX = 0, targetTitleY = 0;
+            let currentTitleX = 0, currentTitleY = 0;
+
+            heroStage.addEventListener('mousemove', (e) => {
+                const rect = heroStage.getBoundingClientRect();
+                const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+                const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+                targetTitleX = normX * 18;
+                targetTitleY = normY * 10;
+            });
+
+            heroStage.addEventListener('mouseleave', () => {
+                targetTitleX = 0;
+                targetTitleY = 0;
+            });
+
+            function animateHeroTitle60fps() {
+                currentTitleX += (targetTitleX - currentTitleX) * 0.1;
+                currentTitleY += (targetTitleY - currentTitleY) * 0.1;
+                heroKineticTitle.style.transform = `translate3d(${currentTitleX.toFixed(2)}px, ${currentTitleY.toFixed(2)}px, 0)`;
+                requestAnimationFrame(animateHeroTitle60fps);
+            }
+            requestAnimationFrame(animateHeroTitle60fps);
+        }
+
+        // 0. APPLE LIQUID GLASS DYNAMIC SPECULAR LIGHT TRACKER
+        document.querySelectorAll('.ios-glass, .stack-card').forEach(glassEl => {
+            glassEl.addEventListener('mousemove', (e) => {
+                const rect = glassEl.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                glassEl.style.setProperty('--liquid-mx', `${x.toFixed(1)}%`);
+                glassEl.style.setProperty('--liquid-my', `${y.toFixed(1)}%`);
+            });
+        });
+
         // 1. NLE EDITING TIMELINE SCROLL & SCRUBBING LOGIC
         const timecodeDisplay = document.getElementById('timecode-display');
         const timelineProgress = document.getElementById('timeline-progress');
@@ -1170,6 +1673,7 @@
 
         function playAndUnmuteCard(card) {
             const video = card.querySelector('video');
+            const syncVideo = card.querySelector('.ba-sync-video');
             const iconState = card.querySelector('.icon-state');
             const soundIcon = card.querySelector('.sound-icon');
             const statusText = card.querySelector('.status-text');
@@ -1179,6 +1683,10 @@
 
             video.muted = false;
             const playPromise = video.play();
+            if (syncVideo) {
+                syncVideo.currentTime = video.currentTime;
+                syncVideo.play().catch(() => {});
+            }
 
             if (playPromise !== undefined) {
                 playPromise.then(() => {
@@ -1200,6 +1708,7 @@
 
         function pauseAndMuteCard(card) {
             const video = card.querySelector('video');
+            const syncVideo = card.querySelector('.ba-sync-video');
             const iconState = card.querySelector('.icon-state');
             const soundIcon = card.querySelector('.sound-icon');
             const statusText = card.querySelector('.status-text');
@@ -1207,6 +1716,7 @@
 
             video.pause();
             video.muted = true;
+            if (syncVideo) syncVideo.pause();
             iconState.className = 'ph-fill ph-play text-2xl ml-0.5 icon-state';
             soundIcon.className = 'ph-fill ph-speaker-slash text-neutral-400 sound-icon';
             statusText.textContent = 'MUTED • PAUSED';
@@ -1230,14 +1740,65 @@
                 }
             });
 
-            // Mobile & Desktop Tap/Click on Play Button or Card
+            // Mobile & Desktop Tap/Click on Play Button or Card (Ignore clicks on Before/After controls)
             card.addEventListener('click', (e) => {
+                if (e.target.closest('.ba-switch-group') || e.target.classList.contains('ba-range-slider')) {
+                    return;
+                }
                 e.preventDefault();
                 if (video.paused || video.muted) {
                     playAndUnmuteCard(card);
                 } else {
                     pauseAndMuteCard(card);
                 }
+            });
+        });
+
+        // 2B. BEFORE / AFTER SPLIT SLIDER & INSTANT TOGGLE LOGIC FOR REELS
+        document.querySelectorAll('[data-ba-split-card]').forEach(card => {
+            const slider = card.querySelector('.ba-range-slider');
+            const beforeLayer = card.querySelector('.ba-before-layer');
+            const dividerLine = card.querySelector('.ba-divider-line');
+
+            if (slider && beforeLayer && dividerLine) {
+                slider.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    beforeLayer.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+                    dividerLine.style.left = `${val}%`;
+                });
+            }
+        });
+
+        document.querySelectorAll('[data-ba-toggle-card]').forEach(card => {
+            const targetVideo = card.querySelector('.ba-target-video');
+            const rawHud = card.querySelector('.ba-raw-hud');
+            const buttons = card.querySelectorAll('.ba-btn');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const mode = btn.getAttribute('data-ba-mode');
+
+                    buttons.forEach(b => {
+                        b.classList.remove('bg-brand-orange', 'text-white', 'font-bold');
+                        b.classList.add('text-neutral-400');
+                    });
+                    btn.classList.add('bg-brand-orange', 'text-white', 'font-bold');
+                    btn.classList.remove('text-neutral-400');
+
+                    if (mode === 'before') {
+                        targetVideo.classList.remove('graded-footage-look');
+                        targetVideo.classList.add('raw-footage-look');
+                        if (rawHud) rawHud.classList.remove('hidden');
+                        // Mute audio in "Before (Raw)" mode to demonstrate SFX impact in "After"
+                        targetVideo.muted = true;
+                    } else {
+                        targetVideo.classList.remove('raw-footage-look');
+                        targetVideo.classList.add('graded-footage-look');
+                        if (rawHud) rawHud.classList.add('hidden');
+                        if (!targetVideo.paused) targetVideo.muted = false;
+                    }
+                });
             });
         });
 
@@ -1341,6 +1902,52 @@
 
         window.addEventListener('scroll', updateCardStackDepth, { passive: true });
         updateCardStackDepth();
+
+        // 6. MODERN SAAS SCROLL REVEAL, 3D CARD ENTRANCE & PARALLAX ORBS
+        const saasAnimatedElements = document.querySelectorAll('.saas-reveal, .saas-3d-card');
+
+        if ('IntersectionObserver' in window) {
+            const saasObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-inview');
+                    } else if (entry.boundingClientRect.top > 0) {
+                        // Reset smoothly when scrolling back above the element so scrolling down replays the SaaS entrance
+                        entry.target.classList.remove('is-inview');
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            saasAnimatedElements.forEach((el) => saasObserver.observe(el));
+        } else {
+            saasAnimatedElements.forEach((el) => el.classList.add('is-inview'));
+        }
+
+        // Scroll-Linked Parallax for Ambient Liquid Glass Orbs & Hero Depth
+        const parallaxOrbs = document.querySelectorAll('[data-saas-parallax]');
+        let saasScrollTicking = false;
+
+        function updateSaasScrollParallax() {
+            const scrollY = window.scrollY || window.pageYOffset;
+
+            parallaxOrbs.forEach((orb) => {
+                const speed = parseFloat(orb.getAttribute('data-saas-parallax')) || 0.1;
+                const yOffset = scrollY * speed;
+                orb.style.transform = `translate3d(0, ${yOffset.toFixed(1)}px, 0)`;
+            });
+
+            saasScrollTicking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!saasScrollTicking) {
+                requestAnimationFrame(updateSaasScrollParallax);
+                saasScrollTicking = true;
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
