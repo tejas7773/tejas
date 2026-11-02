@@ -1,1664 +1,269 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tejs — Pro Video Editor & Cinematographer</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & JetBrains Mono for timecode aesthetic -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tejs — Video Editor & Cinematographer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@500&family=Kaushan+Script&display=swap" rel="stylesheet">
+<style>
+:root{--r:#E84A27;--bl:#2f8bff}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}html.lenis,html.lenis body{height:auto}.lenis{scroll-behavior:auto!important}
+body{background:#050506;color:#fff;font:14px/1.6 Inter,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.an{font-family:Anton,Impact,sans-serif;text-transform:uppercase;line-height:.95;font-weight:400}
+.red{color:var(--r)}
+.mono{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a8a92}
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            orange: '#E84A27', // Reference image orange-red
-                            light: '#E6E6E6',  // Reference image hero grey
-                            dark: '#0A0A0A',   // Deep carbon black
-                            card: '#141414',
-                            border: '#262626'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+/* ===== EDITOR LAYER (intro + scroll reveals) ===== */
+#intro{position:fixed;inset:0;background:#000;z-index:80;display:grid;place-items:center;transition:opacity .8s}
+#intro span{font:400 120px Anton;color:#161618}
+#intro.out{opacity:0;pointer-events:none}
+#ed{position:fixed;inset:0;z-index:90;pointer-events:none;overflow:hidden}
+.sel{position:absolute;border:1px solid var(--bl);opacity:0;animation:selIn 1.7s both}
+.sel.fill{background:rgba(64,82,114,.92)}
+.sel u{position:absolute;width:7px;height:7px;background:#fff;border:1px solid var(--bl);margin:-4px}
+.sel u:nth-child(1){left:0;top:0}.sel u:nth-child(2){left:50%;top:0}.sel u:nth-child(3){left:100%;top:0}.sel u:nth-child(4){left:0;top:50%}
+.sel u:nth-child(5){left:100%;top:50%}.sel u:nth-child(6){left:0;top:100%}.sel u:nth-child(7){left:50%;top:100%}.sel u:nth-child(8){left:100%;top:100%}
+.sel b{position:absolute;left:50%;top:calc(100% + 9px);transform:translateX(-50%);background:var(--bl);font:600 10px 'JetBrains Mono',monospace;padding:1px 7px;border-radius:3px;white-space:nowrap}
+@keyframes selIn{0%{opacity:0;transform:scale(.6)}18%{opacity:1;transform:none}72%{opacity:1}100%{opacity:0}}
+.g{position:absolute;background:rgba(47,139,255,.6);animation:gl 1.6s both}
+.g.h{left:0;right:0;height:1px;transform-origin:left}.g.v{top:0;bottom:0;width:1px;transform-origin:top}
+@keyframes gl{0%{transform:scale(0)}25%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:0}}
+.ch{position:absolute;color:#fff;font:300 20px/1 Inter;animation:selIn 1.6s both}
+#cur{position:fixed;inset:0;z-index:95;pointer-events:none}
+#cur i{position:absolute;left:0;top:0;filter:drop-shadow(0 1px 2px #0007);will-change:transform}
+#pl{position:fixed;left:0;top:0;width:2px;height:0;background:var(--r);box-shadow:0 0 10px var(--r);z-index:60}
 
-    <style>
-        /* Custom Editorial & NLE Timeline Styling */
-        body {
-            background-color: #0A0A0A;
-            color: #FFFFFF;
-            overflow-x: hidden;
-        }
+/* ===== REVEAL ===== */
+[data-r]{opacity:0;transform:perspective(1200px) translate3d(0,60px,-40px) rotateX(9deg) scale(.95);transform-origin:50% 100%;filter:blur(12px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1.2s cubic-bezier(.16,1,.3,1),filter 1s cubic-bezier(.16,1,.3,1);will-change:transform,opacity,filter}
+[data-r].on{opacity:1;transform:none;filter:none}
 
-        /* Blend mode for the reference image overlap effect */
-        .hero-title-blend {
-            mix-blend-mode: difference;
-            color: #ffffff;
-            will-change: transform;
-        }
+/* ===== HERO ===== */
+#hero{position:relative;min-height:100vh;overflow:hidden;background:radial-gradient(ellipse at 60% 40%,#1a0a08,#050506 65%)}
+nav{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:22px 5vw}
+nav .lg{font:400 26px Anton;letter-spacing:.02em}
+nav div a{margin-left:34px;font-size:13px;color:#cfcfd4;transition:color .2s}nav div a:hover{color:var(--r)}
+.pf{position:absolute;left:0;right:0;top:13vh;text-align:center;font-size:23vw;z-index:1;overflow:hidden;white-space:nowrap}
+.pf span{display:inline-block;transform:translateY(105%);transition:transform 1.1s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i)*75ms);background:linear-gradient(#ff4b3a 12%,#6d0f0d 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pf.on span{transform:none}
+.ph{position:absolute;bottom:0;left:50%;margin-left:-22vw;width:44vw;height:90vh;z-index:2;display:flex;align-items:flex-end;justify-content:center}
+.ph img{height:100%;max-width:100%;object-fit:contain;object-position:bottom}
+.ph img.jpg{-webkit-mask-image:radial-gradient(ellipse 46% 50% at 50% 52%,#000 62%,transparent 98%);mask-image:radial-gradient(ellipse 46% 50% at 50% 52%,#000 62%,transparent 98%);filter:grayscale(1) contrast(1.1)}
+.sil{position:relative;width:70%;height:70%;border-radius:46% 46% 0 0/28% 28% 0 0;background:linear-gradient(#26262b,#060607);box-shadow:inset 0 3px 0 rgba(255,90,60,.45)}
+.sil:before{content:"";position:absolute;left:50%;top:-34%;width:44%;aspect-ratio:1;margin-left:-22%;border-radius:50%;background:linear-gradient(#2c2c32,#0b0b0d);box-shadow:inset 0 3px 0 rgba(255,90,60,.4)}
+.hl{position:absolute;left:5vw;top:22vh;z-index:5;max-width:36vw}
+.hi{font:400 4.2vw/1 'Kaushan Script',cursive;transform:rotate(-4deg);margin-bottom:.4vw}
+.nm{font-size:9vw;color:#fff;mix-blend-mode:normal}.nm i{color:var(--r);font-style:normal}
+.rl{color:var(--r);font:400 2.3vw/1.05 Anton;text-transform:uppercase;margin:1.2vw 0 1vw}
+.pg{color:#d6d6da;max-width:26vw;font-size:clamp(12px,1.05vw,15px)}
+.cta{display:inline-flex;gap:10px;margin-top:22px;padding:13px 22px;background:var(--r);border-radius:3px;font-weight:600;font-size:13px;transition:transform .25s}.cta:hover{transform:translateX(5px)}
+.loc{display:block;margin-top:16px}
+.st{position:absolute;right:4vw;top:34vh;z-index:5;text-align:left}
+.st div{margin-bottom:18px}.st b{display:block;font:400 4.2vw/1 Anton;color:var(--r)}.st small{font:500 10px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:#9a9aa2}
 
-        /* 60FPS Kinetic Hero Typography Animation */
-        @keyframes charReveal60fps {
-            0% {
-                opacity: 0;
-                transform: translate3d(0, 115%, 0) rotateX(-65deg) scale(0.92);
-                filter: blur(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translate3d(0, 0%, 0) rotateX(0deg) scale(1);
-                filter: blur(0px);
-            }
-        }
-
-        @keyframes heroFloat60fps {
-            0%, 100% {
-                transform: translate3d(0, 0px, 0);
-            }
-            50% {
-                transform: translate3d(0, -9px, 0);
-            }
-        }
-
-        .hero-char {
-            display: inline-block;
-            will-change: transform, opacity, filter;
-            backface-visibility: hidden;
-            -webkit-font-smoothing: antialiased;
-            transform-style: preserve-3d;
-            animation:
-                charReveal60fps 1.15s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--char-index) * 0.055s) both,
-                heroFloat60fps 4.8s ease-in-out calc(1.2s + var(--char-index) * 0.14s) infinite;
-        }
-
-        /* Before / After Footage Look Filters */
-        .raw-footage-look {
-            filter: saturate(32%) contrast(78%) brightness(106%) sepia(10%);
-        }
-        .graded-footage-look {
-            filter: saturate(122%) contrast(112%) brightness(101%);
-        }
-
-        /* Custom Dual-Circle Cursor CSS */
-        .cursor-dot {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            background-color: #C8B282;
-            border-radius: 9999px;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate3d(-50%, -50%, 0);
-            transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease;
-        }
-        .cursor-ring {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 44px;
-            height: 44px;
-            border: 1.5px solid rgba(200, 178, 130, 0.65);
-            border-radius: 9999px;
-            pointer-events: none;
-            z-index: 9998;
-            transform: translate3d(-50%, -50%, 0);
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
-        }
-        body.cursor-hover .cursor-dot {
-            background-color: #E84A27;
-            width: 12px;
-            height: 12px;
-        }
-        body.cursor-hover .cursor-ring {
-            width: 64px;
-            height: 64px;
-            border-color: rgba(232, 74, 39, 0.85);
-            background-color: rgba(232, 74, 39, 0.08);
-        }
-
-        /* Editorial B&W Portrait Effect (knocks out white studio background into hero gray) */
-        .editorial-portrait {
-            filter: grayscale(100%) contrast(118%) brightness(106%);
-            mix-blend-mode: multiply;
-            -webkit-mask-image: radial-gradient(ellipse 46% 50% at 50% 52%, black 65%, transparent 98%);
-            mask-image: radial-gradient(ellipse 46% 50% at 50% 52%, black 65%, transparent 98%);
-        }
-
-        /* NLE Timeline Ruler ticks background */
-        .timeline-ruler {
-            background-image: repeating-linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0.18) 0px,
-                rgba(255, 255, 255, 0.18) 1px,
-                transparent 1px,
-                transparent 12px
-            ),
-            repeating-linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0.4) 0px,
-                rgba(255, 255, 255, 0.4) 1px,
-                transparent 1px,
-                transparent 60px
-            );
-            background-size: 100% 6px, 100% 12px;
-            background-position: bottom;
-            background-repeat: repeat-x;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0A0A0A;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #E84A27;
-        }
-
-        /* Subtle film grain texture */
-        .bg-grain {
-            background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-
-        /* Video Card hover glow */
-        .video-card {
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-        }
-        .video-card:hover {
-            transform: translateY(-4px);
-            border-color: #E84A27;
-        }
-
-        /* ========================================== */
-        /* APPLE NEW LIQUID GLASS UI SYSTEM           */
-        /* ========================================== */
-        :root {
-            --liquid-mx: 50%;
-            --liquid-my: 50%;
-        }
-
-        .ios-glass,
-        .liquid-glass {
-            position: relative;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.16) 0%,
-                rgba(255, 255, 255, 0.04) 45%,
-                rgba(255, 255, 255, 0.10) 100%
-            );
-            backdrop-filter: url(#apple-liquid-refraction) blur(34px) saturate(230%) brightness(1.06);
-            -webkit-backdrop-filter: blur(34px) saturate(230%) brightness(1.06);
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            box-shadow:
-                0 28px 60px -12px rgba(0, 0, 0, 0.78),
-                inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.55),
-                inset 0 -1.5px 2px 0 rgba(255, 255, 255, 0.14),
-                inset 1.5px 0 2px 0 rgba(255, 255, 255, 0.22);
-        }
-
-        /* Interactive specular liquid highlight that follows cursor */
-        .ios-glass::after,
-        .stack-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: radial-gradient(
-                480px circle at var(--liquid-mx, 50%) var(--liquid-my, 50%),
-                rgba(255, 255, 255, 0.16),
-                rgba(232, 74, 39, 0.06) 35%,
-                transparent 70%
-            );
-            pointer-events: none;
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .ios-glass-pill {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.19) 0%,
-                rgba(255, 255, 255, 0.05) 55%,
-                rgba(255, 255, 255, 0.12) 100%
-            );
-            backdrop-filter: blur(26px) saturate(220%) brightness(1.08);
-            -webkit-backdrop-filter: blur(26px) saturate(220%) brightness(1.08);
-            border: 1px solid rgba(255, 255, 255, 0.26);
-            box-shadow:
-                0 10px 28px rgba(0, 0, 0, 0.45),
-                inset 0 1.5px 1px rgba(255, 255, 255, 0.52),
-                inset 0 -1px 1px rgba(255, 255, 255, 0.12);
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .ios-glass-pill:hover {
-            transform: translateY(-1px) scale(1.01);
-            border-color: rgba(255, 255, 255, 0.42);
-            box-shadow:
-                0 14px 32px rgba(232, 74, 39, 0.2),
-                inset 0 1.5px 2px rgba(255, 255, 255, 0.72),
-                inset 0 -1px 1px rgba(232, 74, 39, 0.25);
-        }
-
-        /* Light-mode Liquid Glass Dock for Hero Navbar */
-        .liquid-glass-light {
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.65) 0%,
-                rgba(255, 255, 255, 0.28) 50%,
-                rgba(255, 255, 255, 0.48) 100%
-            );
-            backdrop-filter: blur(28px) saturate(200%);
-            -webkit-backdrop-filter: blur(28px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.75);
-            box-shadow:
-                0 16px 36px rgba(0, 0, 0, 0.08),
-                inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95),
-                inset 0 -1px 1px rgba(0, 0, 0, 0.05);
-        }
-
-        .ios-glass-input {
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.08) 0%,
-                rgba(255, 255, 255, 0.02) 100%
-            );
-            backdrop-filter: blur(20px) saturate(190%);
-            -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow:
-                inset 0 1.5px 2px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0.5px rgba(255, 255, 255, 0.25);
-        }
-        .ios-glass-input:focus {
-            background: rgba(255, 255, 255, 0.11);
-            border-color: #E84A27;
-            box-shadow:
-                0 0 0 4px rgba(232, 74, 39, 0.22),
-                inset 0 1.5px 1px rgba(255, 255, 255, 0.45);
-        }
-
-        /* ========================================== */
-        /* STICKY SCROLL CARD STACKING EFFECT         */
-        /* ========================================== */
-        .stack-cards-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-            padding-bottom: 4rem;
-        }
-
-        .stack-card {
-            position: sticky;
-            transform-origin: center top;
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        filter 0.35s ease,
-                        border-color 0.3s ease,
-                        box-shadow 0.35s ease;
-            /* Apple Liquid Glass Card Surface */
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.16) 0%,
-                rgba(255, 255, 255, 0.04) 45%,
-                rgba(20, 20, 24, 0.62) 100%
-            );
-            backdrop-filter: url(#apple-liquid-refraction) blur(36px) saturate(230%) brightness(1.06);
-            -webkit-backdrop-filter: blur(36px) saturate(230%) brightness(1.06);
-            border: 1px solid rgba(255, 255, 255, 0.26);
-            box-shadow:
-                0 -20px 48px rgba(0, 0, 0, 0.78),
-                0 24px 48px rgba(0, 0, 0, 0.65),
-                inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.55),
-                inset 0 -1.5px 1.5px 0 rgba(255, 255, 255, 0.12);
-            will-change: transform;
-            overflow: hidden;
-        }
-
-        /* Subtle diagonal Apple Liquid Glass sheen reflection */
-        .stack-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -50%;
-            width: 200%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.2), transparent 62%);
-            pointer-events: none;
-        }
-
-        .stack-card:hover {
-            border-color: rgba(232, 74, 39, 0.75);
-            box-shadow:
-                0 -20px 50px rgba(0, 0, 0, 0.85),
-                0 24px 55px rgba(232, 74, 39, 0.18),
-                inset 0 2px 2px 0 rgba(255, 255, 255, 0.7);
-        }
-
-        /* ========================================== */
-        /* MODERN SAAS SCROLL REVEAL & 3D PERSPECTIVE */
-        /* ========================================== */
-        .saas-perspective-stage {
-            perspective: 1400px;
-        }
-
-        /* Standard SaaS Blur + Slide + Scale Reveal */
-        .saas-reveal {
-            opacity: 0;
-            transform: translate3d(0, 44px, 0) scale(0.96);
-            filter: blur(10px);
-            transition:
-                opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-            transition-delay: var(--saas-delay, 0ms);
-            will-change: transform, opacity, filter;
-        }
-
-        .saas-reveal.is-inview {
-            opacity: 1;
-            transform: translate3d(0, 0, 0) scale(1);
-            filter: blur(0px);
-        }
-
-        /* SaaS 3D Dashboard-Style Tilt Card Reveal on Scroll */
-        .saas-3d-card {
-            opacity: 0;
-            transform: perspective(1200px) translate3d(0, 64px, -40px) rotateX(14deg) scale(0.94);
-            filter: blur(8px);
-            transform-origin: center bottom;
-            transition:
-                opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 1s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 1s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.3s ease;
-            transition-delay: var(--saas-delay, 0ms);
-            will-change: transform, opacity, filter;
-        }
-
-        .saas-3d-card.is-inview {
-            opacity: 1;
-            transform: perspective(1200px) translate3d(0, 0, 0) rotateX(0deg) scale(1);
-            filter: blur(0px);
-        }
-
-        .saas-3d-card.is-inview:hover {
-            transform: perspective(1200px) translate3d(0, -6px, 12px) rotateX(1.5deg) scale(1.01);
-        }
-
-        /* SaaS Glowing Horizon Section Divider Beam */
-        .saas-horizon-beam {
-            position: relative;
-            height: 1px;
-            width: 100%;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.14) 20%, rgba(232,74,39,0.75) 50%, rgba(255,255,255,0.14) 80%, transparent 100%);
-            overflow: visible;
-        }
-        .saas-horizon-beam::after {
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 38%;
-            height: 5px;
-            background: radial-gradient(ellipse at center, rgba(232, 74, 39, 0.65) 0%, transparent 75%);
-            filter: blur(4px);
-            pointer-events: none;
-        }
-    </style>
+/* ===== SECTIONS ===== */
+section{position:relative;padding:11vh 5vw;border-top:1px solid #1b1b1f}
+.hd{font-size:clamp(40px,7vw,104px);margin:10px 0 40px}
+.row{display:grid;gap:18px;margin-bottom:18px}
+.row.h{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.row.v{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.cd{position:relative;background:#111;border:1px solid #232328;overflow:hidden;border-radius:4px}
+.cd video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:linear-gradient(135deg,#1c1c22,#0c0c0f)}
+.v .cd video{aspect-ratio:9/16}
+.cd figcaption{padding:12px 14px}.cd h3{font:600 14px Inter}.cd p{font-size:12px;color:#8e8e96;margin-top:2px}
+.px{position:absolute;inset:0 0 auto 0;display:grid;grid-template-columns:repeat(10,1fr);z-index:2;pointer-events:none;aspect-ratio:16/9}
+.v .px{aspect-ratio:9/16;grid-template-columns:repeat(6,1fr)}
+.px i{background:var(--r);transition:opacity .5s var(--d);opacity:1}.cd.on .px i{opacity:0}
+.mq{overflow:hidden;border-block:1px solid #1b1b1f;padding:20px 0;margin-top:30px}
+.mq div{display:flex;gap:70px;width:max-content;animation:mq 26s linear infinite;font:400 34px Anton;text-transform:uppercase;color:#3a3a40}
+.mq div:hover{animation-play-state:paused;color:#fff}@keyframes mq{to{transform:translateX(-50%)}}
+.rv{display:grid;grid-template-columns:1fr 1.25fr;gap:5vw}
+.rv .it{display:grid;grid-template-columns:36px 1fr;gap:6px 14px;padding:18px 0;border-bottom:1px solid #1d1d21}
+.rv .it span{color:var(--r);font:500 11px 'JetBrains Mono'}.rv .it h4{font:600 16px Inter}.rv .it h4 em{font:400 12px Inter;color:#8e8e96;font-style:normal;margin-left:8px}
+.rv .it p{grid-column:2;color:#b4b4bb;font-size:13px}
+.ct{display:grid;grid-template-columns:1fr 1fr;gap:5vw}
+.ct li{list-style:none;margin:18px 0}.ct li small{display:block}
+form{display:grid;gap:12px}
+input,select,textarea{width:100%;background:#0e0e11;border:1px solid #26262c;border-radius:4px;color:#fff;padding:13px;font:inherit}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--r)}
+button{background:var(--r);color:#fff;border:0;padding:15px;border-radius:4px;font:600 14px Inter;cursor:pointer}
+footer{padding:26px 5vw;border-top:1px solid #1b1b1f;font-size:12px;color:#6c6c74}
+section{overflow:hidden;isolation:isolate}
+.orb{position:absolute;z-index:-1;width:420px;height:420px;border-radius:50%;background:rgba(232,74,39,.16);filter:blur(120px);pointer-events:none}
+.cd video{scale:1.14;will-change:translate}.cd.on:hover{transform:translateY(-6px) scale(1.012);border-color:var(--r)}
+.tc{position:absolute;left:10px;top:10px;z-index:3;background:#000b;padding:2px 8px;border-radius:3px}
+.cd.nov video{opacity:0}.cd.nov:after{content:"\25B6";position:absolute;inset:0;display:grid;place-items:center;font-size:28px;color:#4a4a52}
+.ov{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;padding:38px 14px 12px;background:linear-gradient(transparent,#000d);pointer-events:none}
+.ov h3{font:700 18px Inter;margin-top:6px}.tg{font:500 10px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;background:var(--r);padding:2px 8px;border-radius:3px}
+.pill{background:#ffffff22;backdrop-filter:blur(8px);padding:3px 11px;border-radius:99px;color:#fff;letter-spacing:0;text-transform:none}
+.cd figcaption .mono.red{color:var(--r);font-weight:600}.cd figcaption h3{margin-top:4px}
+.row.h,.row.v{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.row.h{grid-template-columns:repeat(2,1fr)}.row.v{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.row.h{grid-template-columns:1fr}.row.v{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.hl{position:relative;left:0;top:0;max-width:none;padding:90px 6vw 0;z-index:6}.hi{font-size:9vw}.nm{font-size:22vw}.rl{font-size:6vw}.pg{max-width:none;font-size:13px}
+.pf{font-size:34vw;top:26vh}.ph{width:90vw;margin-left:-45vw;height:60vh}.st{display:none}#hero{min-height:130vh}.rv,.ct{grid-template-columns:1fr}nav div a{margin-left:16px}}
+@media(prefers-reduced-motion:reduce){#intro,#ed,#cur{display:none}[data-r],.pf span{opacity:1!important;transform:none!important;filter:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 </head>
-<body class="selection:bg-brand-orange selection:text-white">
+<body>
+<div id="intro"><span>T</span></div><div id="ed"></div><div id="cur"></div><div id="pl"></div>
 
-    <!-- Apple Liquid Glass SVG Optical Refraction Filter -->
-    <svg class="hidden" width="0" height="0" aria-hidden="true">
-        <defs>
-            <filter id="apple-liquid-refraction" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="7" result="liquidNoise" />
-                <feGaussianBlur in="liquidNoise" stdDeviation="2.5" result="smoothedNoise" />
-                <feDisplacementMap in="SourceGraphic" in2="smoothedNoise" scale="7" xChannelSelector="R" yChannelSelector="G" />
-            </filter>
-        </defs>
-    </svg>
+<header id="hero">
+  <nav><a class="lg" href="#hero">TEJS<span class="red">.</span></a><div><a href="#work">Work</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a></div></nav>
+  <h1 class="pf an" id="pf" aria-label="Portfolio"></h1>
+  <div class="ph" data-r="Portrait"><img src="tejs-cutout.png" alt="Tejs" onerror="if(!this.dataset.f){this.dataset.f=1;this.className='jpg';this.src='img1.jpeg'}else{this.outerHTML='<div class=sil></div>'}"></div>
+  <div class="hl">
+    <div class="hi" data-r="Text">Hello, I’m</div>
+    <div class="nm an" data-r="Heading">Tejs<i>.</i></div>
+    <div class="rl" data-r="Role">Video Editor &amp;<br>Cinematographer</div>
+    <p class="pg" data-r="Paragraph">From commercial films and wedding cinema to viral Reels—delivering polished, impactful edits with fast turnaround.</p>
+    <a class="cta" href="#work" data-r="Button">See my work &nbsp;→</a>
+    <span class="mono loc" data-r="Location">Washim, Maharashtra • Worldwide</span>
+  </div>
+  <div class="st" data-r="Stats">
+    <div><b><span class="n" data-n="8">0</span>.</b><small>Selected edits</small></div>
+    <div><b><span class="n" data-n="6">0</span>.</b><small>Client reviews</small></div>
+    <div><b><span class="n" data-n="3">0</span>.</b><small>Editing tools</small></div>
+  </div>
+</header>
 
-    <!-- Custom Dual-Circle Cursor Elements (Hidden on touch devices) -->
-    <div id="cursor-dot" class="cursor-dot hidden md:block"></div>
-    <div id="cursor-ring" class="cursor-ring hidden md:block"></div>
+<section id="work"><i class="orb" data-p="-.14" style="top:8%;left:-6%"></i><i class="orb" data-p=".12" style="bottom:4%;right:-8%"></i>
+  <div class="mono" data-r="Tag">01 / Selected Work</div>
+  <h2 class="hd an" data-r="Heading">Work that<br><span class="red">speaks.</span></h2>
+  <div class="mono" data-r="Tag" style="margin:6px 0 14px">Horizontal Showcase • 16:9</div>
+  <div class="row h" id="rh"></div>
+  <div class="mono" data-r="Tag" style="margin:34px 0 14px">Vertical Reels • 9:16</div>
+  <div class="row v" id="rv"></div>
+  <div class="mq" data-r="Clients"><div id="mq"></div></div>
+</section>
 
-    <!-- ========================================== -->
-    <!-- STICKY NLE EDITING TIMELINE SCROLL TRACKER -->
-    <!-- ========================================== -->
-    <div class="fixed top-2 left-1/2 -translate-x-1/2 w-[96%] max-w-7xl z-50 ios-glass rounded-2xl select-none">
-        <div class="px-3 sm:px-5 h-11 flex items-center justify-between gap-3 text-[11px] font-mono">
-            
-            <!-- Left: Live Timecode & REC Indicator -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <div class="flex items-center gap-1.5 bg-red-500/10 border border-red-500/30 px-2 py-0.5 rounded text-red-400">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <span class="font-bold tracking-wider">REC</span>
-                </div>
-                <div id="timecode-display" class="text-brand-orange font-bold tracking-widest text-xs sm:text-sm bg-black/60 px-2.5 py-0.5 rounded border border-white/10">
-                    00:00:00:00
-                </div>
-            </div>
-
-            <!-- Center: Interactive NLE Sequence Track & Playhead -->
-            <div id="timeline-scrubber" class="relative flex-1 h-8 bg-[#161616] rounded border border-white/10 overflow-hidden cursor-pointer flex items-center">
-                <!-- Video & Audio Clips Visualization inside the bar -->
-                <div class="w-full h-full flex flex-col justify-between p-0.5 opacity-60">
-                    <!-- V1 Track -->
-                    <div class="w-full h-2.5 flex gap-1">
-                        <div class="w-1/5 bg-indigo-500/50 rounded-xs border-l-2 border-indigo-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">01_INTRO.mp4</div>
-                        <div class="w-2/5 bg-purple-500/50 rounded-xs border-l-2 border-purple-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">02_SHOWREEL_MASTER.prproj</div>
-                        <div class="w-1/5 bg-emerald-500/50 rounded-xs border-l-2 border-emerald-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">03_REVIEWS.mov</div>
-                        <div class="w-1/5 bg-amber-500/50 rounded-xs border-l-2 border-amber-400 text-[7px] leading-none px-1 flex items-center text-white/80 truncate">04_CONTACT</div>
-                    </div>
-                    <!-- Ruler ticks at bottom -->
-                    <div class="w-full h-3 timeline-ruler"></div>
-                </div>
-
-                <!-- Active Progress Tint -->
-                <div id="timeline-progress" class="absolute top-0 left-0 h-full bg-brand-orange/15 pointer-events-none" style="width: 0%;"></div>
-
-                <!-- Red NLE Playhead -->
-                <div id="timeline-playhead" class="absolute top-0 bottom-0 w-[2px] bg-brand-orange pointer-events-none z-10 shadow-[0_0_8px_#E84A27]" style="left: 0%;">
-                    <!-- Playhead Cap -->
-                    <div class="w-3 h-2.5 bg-brand-orange -ml-[5px] clip-playhead rounded-t-xs"></div>
-                </div>
-            </div>
-
-            <!-- Right: Sequence Metadata -->
-            <div class="hidden md:flex items-center gap-3 text-white/50 shrink-0">
-                <span class="px-1.5 py-0.5 bg-white/5 rounded text-white/70">V1</span>
-                <span class="px-1.5 py-0.5 bg-white/5 rounded text-white/70">A1+A2</span>
-                <span>4K 60FPS</span>
-            </div>
-        </div>
+<section id="reviews"><i class="orb" data-p="-.12" style="top:20%;right:-6%"></i>
+  <div class="rv">
+    <div><div class="mono" data-r="Tag">02 / Client Endorsements</div><h2 class="hd an" data-r="Heading" style="margin-top:14px">Trusted by<br>brands &amp;<br><span class="red">creators.</span></h2><p data-r="Paragraph" style="color:#b4b4bb;max-width:380px">Real feedback from teams, founders, and creators who trusted Tejs with their post-production workflow.</p></div>
+    <div>
+      <div class="it" data-r="Review"><span>01</span><h4>Pizzatoons<em>Creative Content Studio</em></h4><p>“Tejs completely transformed our animated shorts and food promos. His comedic timing, punchy sound effects, and snappy transitions in Premiere Pro boosted our average watch time almost immediately. Super easy to work with!”</p></div>
+      <div class="it" data-r="Review"><span>02</span><h4>Meta Ninza<em>Digital Brand &amp; Creator</em></h4><p>“Finding an editor who understands fast-paced tech content is rare. Tejs nailed our After Effects motion graphics and retention hooks from day one. Our Reels look cleaner, sharper, and consistently outperform our older videos.”</p></div>
+      <div class="it" data-r="Review"><span>03</span><h4>Sahib Kaur<em>Influencer &amp; Public Figure</em></h4><p>“Working with Tejs has been a blessing for my content schedule. He knows exactly how to match the vibe, music, and aesthetic I want without me having to over-explain. Fast delivery and zero compromise on quality!”</p></div>
+      <div class="it" data-r="Review"><span>04</span><h4>Wedprisam<em>Luxury Wedding Films</em></h4><p>“Wedding films require deep emotion, seamless rhythm, and rich color grading. Tejs took hours of our raw multi-cam footage and crafted breathtaking cinematic teasers and reels that left our couples speechless.”</p></div>
+      <div class="it" data-r="Review"><span>05</span><h4>Vault of Gallery<em>Art &amp; Visual Collective</em></h4><p>“Aesthetic perfection! For Vault of Gallery, every frame needs to look like art. Tejs’s eye for speed-ramping, subtle visual effects, and atmospheric audio design gave our visual reels an unmistakable signature style.”</p></div>
+      <div class="it" data-r="Review"><span>06</span><h4>Raksha Hospitality<em>Hospitality Brand</em></h4><p>“Tejs helped us showcase our properties and dining experiences with a truly premium feel. His promotional edits brought out the warmth and luxury of Raksha Hospitality, driving real inquiries from social media.”</p></div>
     </div>
-
-    <!-- ========================================== -->
-    <!-- HERO SECTION (Light Gray Reference Layout) -->
-    <!-- ========================================== -->
-    <header class="relative bg-[#E6E6E6] text-[#111111] pt-16 min-h-[90vh] flex flex-col justify-between overflow-hidden">
-        
-        <!-- Top Navigation Bar (Apple Liquid Glass Capsule Dock) -->
-        <nav class="w-[94%] max-w-7xl mx-auto mt-2 px-5 py-3 rounded-full liquid-glass-light flex items-center justify-between text-xs sm:text-sm font-medium tracking-tight z-30">
-            <a href="#" class="font-semibold hover:opacity-70 transition flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-brand-orange"></span>
-                <span>© Tejs Visuals &amp; Edit</span>
-            </a>
-            <div class="flex items-center gap-5 sm:gap-12">
-                <a href="#work" class="hover:text-brand-orange transition">Projects</a>
-                <a href="#about" class="hover:text-brand-orange transition">About</a>
-                <a href="#reviews" class="hidden sm:inline-block hover:text-brand-orange transition">Reviews</a>
-                <a href="#contact" class="px-3.5 py-1.5 rounded-full bg-black/85 text-white hover:bg-brand-orange transition font-semibold text-xs">Contact</a>
-            </div>
-        </nav>
-
-        <!-- Center Editorial Portrait & Giant Overlapping Name -->
-        <div id="hero-stage" class="relative flex-1 flex items-center justify-center my-auto py-8 sm:py-0" style="perspective: 1200px;">
-            
-            <!-- Giant 60FPS Animated Typography (Spans full width, blends with portrait) -->
-            <h1 id="hero-kinetic-title" aria-label="Tejs Edits" class="hero-title-blend relative z-20 text-[18vw] sm:text-[15.5vw] font-extrabold tracking-tighter leading-none select-none text-center w-full pointer-events-none flex items-center justify-center">
-                <span class="hero-char" style="--char-index: 0;">T</span><span class="hero-char" style="--char-index: 1;">e</span><span class="hero-char" style="--char-index: 2;">j</span><span class="hero-char" style="--char-index: 3;">s</span><span class="inline-block w-[3.5vw]"></span><span class="hero-char" style="--char-index: 4;">E</span><span class="hero-char" style="--char-index: 5;">d</span><span class="hero-char" style="--char-index: 6;">i</span><span class="hero-char" style="--char-index: 7;">t</span><span class="hero-char" style="--char-index: 8;">s</span>
-            </h1>
-
-            <!-- Center Landscape Portrait Container (No inner overflow/transform so mix-blend-mode: multiply blends directly with #E6E6E6 header) -->
-            <img 
-                src="img1.jpeg" 
-                onerror="if(this.src.indexOf('WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg')===-1){this.src='WhatsApp Image 2026-10-24 at 3.58.30 PM.jpeg';}else if(this.src.indexOf('image_54fb00.jpg')===-1){this.src='image_54fb00.jpg';}"
-                alt="Tejs - Video Editor & Cinematographer Portrait" 
-                class="
-                    absolute bottom-0 left-1/2 -translate-x-1/2 z-10
-                    w-[135vw] sm:w-[105vw] md:w-[92vw] lg:w-[82vw] max-w-[1380px]
-                    h-[78%] sm:h-[88%] md:h-[94%]
-                    object-cover object-top
-                    editorial-portrait select-none pointer-events-none
-                "
-            />
-        </div>
-
-        <!-- Hero Bottom Bar: Socials Left, Role Right (Matches Reference) -->
-        <div class="w-full max-w-7xl mx-auto px-6 pb-8 pt-4 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 z-30">
-            
-            <!-- Left Social Links -->
-            <div class="flex flex-col gap-2 text-xs sm:text-sm font-medium">
-                <a href="https://wa.me/917020071100" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
-                    <i class="ph ph-whatsapp-logo text-lg group-hover:scale-110 transition"></i>
-                    <span>WhatsApp</span>
-                </a>
-                <a href="#contact" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
-                    <i class="ph ph-instagram-logo text-lg group-hover:scale-110 transition"></i>
-                    <span>Instagram</span>
-                </a>
-                <a href="#work" class="flex items-center gap-2.5 hover:text-brand-orange transition group">
-                    <i class="ph ph-film-strip text-lg group-hover:scale-110 transition"></i>
-                    <span>Showreel</span>
-                </a>
-            </div>
-
-            <!-- Right Role Title -->
-            <div class="text-left sm:text-right">
-                <p class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-[#111111]">
-                    <span class="text-brand-orange font-mono font-normal">//</span> Video Editor<br>
-                    Cinematographer
-                </p>
-                <p class="text-xs font-mono uppercase tracking-widest text-neutral-600 mt-1">
-                    Washim, Maharashtra • Worldwide
-                </p>
-            </div>
-        </div>
-    </header>
-
-    <!-- ========================================== -->
-    <!-- INTRO / ABOUT SECTION (Dark Reference UI)  -->
-    <!-- ========================================== -->
-    <div class="saas-horizon-beam"></div>
-    <section id="about" class="saas-perspective-stage relative bg-brand-dark bg-grain py-20 sm:py-28 px-6 border-b border-white/10 overflow-hidden">
-        <!-- Ambient Liquid Glass Backlight Orbs (Scroll Parallax Driven) -->
-        <div data-saas-parallax="-0.12" class="pointer-events-none absolute -top-20 left-1/4 w-96 h-96 rounded-full bg-brand-orange/15 blur-[130px] will-change-transform"></div>
-        <div data-saas-parallax="0.15" class="pointer-events-none absolute bottom-0 right-10 w-80 h-80 rounded-full bg-indigo-500/15 blur-[120px] will-change-transform"></div>
-
-        <div class="relative z-10 max-w-7xl mx-auto">
-            
-            <!-- Section Tag -->
-            <div class="saas-reveal text-brand-orange font-mono text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
-                <span>// Intro</span>
-                <span class="h-[1px] w-10 bg-brand-orange/40"></span>
-            </div>
-
-            <!-- Clean, Short & Professional Dual-Color Statement -->
-            <h2 class="saas-reveal text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.2] max-w-5xl" style="--saas-delay: 80ms;">
-                I’m <span class="text-white">Tejs</span>, a <span class="text-brand-orange">video editor &amp; cinematographer from Washim, Maharashtra</span> crafting high-retention stories, sharp visuals, and clean cuts for brands and creators.
-            </h2>
-
-            <!-- Bottom Two-Column Bio & Software Stack -->
-            <div class="mt-14 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start lg:items-center">
-                
-                <!-- Left Software Badges -->
-                <div class="lg:col-span-7 flex flex-col gap-3.5">
-                    <p class="saas-reveal text-[11px] font-mono uppercase tracking-wider text-neutral-400" style="--saas-delay: 120ms;">Primary Editing Suite</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                        <!-- Premiere Pro -->
-                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 160ms;">
-                            <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Pr</span>
-                            <div class="min-w-0">
-                                <div class="text-xs font-semibold text-white truncate">Premiere Pro</div>
-                                <div class="text-[10px] text-neutral-400 truncate">Timeline &amp; Color</div>
-                            </div>
-                        </div>
-                        <!-- After Effects -->
-                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 240ms;">
-                            <span class="w-9 h-9 shrink-0 rounded-xl bg-[#00005B]/90 border border-[#9999FF]/40 flex items-center justify-center font-bold text-[#9999FF] text-xs shadow-inner">Ae</span>
-                            <div class="min-w-0">
-                                <div class="text-xs font-semibold text-white truncate">After Effects</div>
-                                <div class="text-[10px] text-neutral-400 truncate">Motion &amp; VFX</div>
-                            </div>
-                        </div>
-                        <!-- CapCut PC -->
-                        <div class="saas-3d-card flex items-center gap-3 ios-glass-pill hover:border-brand-orange/60 transition px-4 py-3 rounded-2xl" style="--saas-delay: 320ms;">
-                            <span class="w-9 h-9 shrink-0 rounded-xl bg-white text-black flex items-center justify-center font-extrabold text-[11px] shadow-inner">CC</span>
-                            <div class="min-w-0">
-                                <div class="text-xs font-semibold text-white truncate">CapCut PC</div>
-                                <div class="text-[10px] text-neutral-400 truncate">Fast-Paced Reels</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Sub-paragraph & CTA Pill -->
-                <div class="saas-reveal lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-5 lg:pl-6 lg:border-l lg:border-white/10" style="--saas-delay: 260ms;">
-                    <p class="text-neutral-300 text-sm leading-relaxed max-w-md">
-                        From commercial films and wedding cinema to viral Reels—delivering polished, impactful edits with fast turnaround.
-                    </p>
-                    <a href="#work" class="shrink-0 inline-flex items-center gap-2.5 px-6 py-3 rounded-full ios-glass-pill text-xs sm:text-sm font-medium text-white hover:bg-brand-orange hover:border-brand-orange transition duration-300 group">
-                        <span>See my Work</span>
-                        <i class="ph ph-arrow-down-right text-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition"></i>
-                    </a>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- SELECTED WORK (4 HORIZONTAL + 4 VERTICAL)  -->
-    <!-- ========================================== -->
-    <div class="saas-horizon-beam"></div>
-    <section id="work" class="saas-perspective-stage relative py-24 sm:py-32 px-6 bg-[#0A0A0A] border-b border-white/10 overflow-hidden">
-        <!-- Ambient Liquid Glass Backlight Orbs for Work Section -->
-        <div data-saas-parallax="0.18" class="pointer-events-none absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-brand-orange/15 blur-[140px] will-change-transform"></div>
-        <div data-saas-parallax="-0.16" class="pointer-events-none absolute bottom-1/4 -right-20 w-96 h-96 rounded-full bg-cyan-500/10 blur-[140px] will-change-transform"></div>
-
-        <div class="relative z-10 max-w-7xl mx-auto">
-            
-            <!-- Section Header -->
-            <div class="saas-reveal flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
-                <div>
-                    <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3">
-                        // Timeline Masterpieces
-                    </div>
-                    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight">Selected Edits</h2>
-                </div>
-                <div class="flex items-center gap-2.5 ios-glass-pill px-4 py-2.5 rounded-full text-xs sm:text-sm text-neutral-200 self-start md:self-auto">
-                    <i class="ph-fill ph-speaker-high text-brand-orange text-base animate-pulse"></i>
-                    <span class="hidden sm:inline">Hover over any video to Play &amp; Unmute</span>
-                    <span class="sm:hidden">Tap any video play button to Play &amp; Unmute</span>
-                </div>
-            </div>
-
-            <!-- 1. HORIZONTAL VIDEOS (4 Long-Form 16:9 Showcases) -->
-            <div class="saas-reveal mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
-                    <i class="ph ph-monitor-play text-brand-orange text-base"></i>
-                    <span>01 / Horizontal Widescreen Edits + Gaming &amp; Brand Showcases (16:9)</span>
-                </div>
-                <span class="px-3 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange self-start sm:self-auto">
-                    4 Showcases • 16:9
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-20">
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 0ms;" data-video-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="meta ninza_1.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
-                        </div>
-                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
-                            <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Brand Film</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Cinematic Brand Story</h3>
-                            </div>
-                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Pr + Ae</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 60ms;" data-video-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="VJ Event_2.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
-                        </div>
-                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
-                            <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Wedding &amp; Events</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Royal Wedding Aftermovie</h3>
-                            </div>
-                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Premiere Pro</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 120ms;" data-video-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="6MONTH BABY demo_1.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
-                        </div>
-                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
-                            <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Family Film</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">6-Month Celebration Film</h3>
-                            </div>
-                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">Pr + Ae</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5" style="--saas-delay: 180ms;" data-video-card>
-                    <div class="relative aspect-video w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="BTS.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play video with sound" class="play-trigger w-16 h-16 rounded-full ios-glass-pill bg-brand-orange/85 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-2xl ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3.5 right-4 z-20 flex items-center gap-1.5 ios-glass-pill px-3 py-1 rounded-full text-[11px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED • PAUSED</span>
-                        </div>
-                        <div class="absolute bottom-3.5 left-4 right-4 z-20 flex items-end justify-between pointer-events-none">
-                            <div>
-                                <span class="text-[10px] font-mono uppercase tracking-widest bg-brand-orange px-2 py-0.5 rounded text-white">Behind the Scenes</span>
-                                <h3 class="text-lg sm:text-xl font-bold text-white mt-1.5">Creative Production BTS</h3>
-                            </div>
-                            <span class="text-xs font-mono text-white/90 ios-glass-pill px-2.5 py-1 rounded-full">After Effects</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. VERTICAL VIDEOS (4 Short-Form 9:16 Reels/Shorts) -->
-            <div class="saas-reveal mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
-                    <i class="ph ph-device-mobile-camera text-brand-orange text-base"></i>
-                    <span>02 / High-Retention Vertical Reels (9:16)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-1 rounded-full ios-glass-pill text-[10px] font-mono text-brand-orange flex items-center gap-1.5">
-                        <i class="ph-bold ph-sliders-horizontal"></i>
-                        <span>Four Selected Short-Form Edits</span>
-                    </span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 0ms;" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="car_delivery.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED</span>
-                        </div>
-                    </div>
-                    <div class="px-2 pt-4 pb-3">
-                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Automotive Film</span>
-                        <h3 class="text-base font-bold text-white mt-1">Luxury on the Move</h3>
-                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A cinematic automotive edit with dynamic framing, refined pacing and impactful sound design.</p>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 90ms;" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="Lambo.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED</span>
-                        </div>
-                    </div>
-                    <div class="px-2 pt-4 pb-3">
-                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Automotive Showcase</span>
-                        <h3 class="text-base font-bold text-white mt-1">Lamborghini — Pure Performance</h3>
-                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A high-energy supercar showcase built around bold visuals, smooth transitions and beat-synced cuts.</p>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 180ms;" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="real_estate.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED</span>
-                        </div>
-                    </div>
-                    <div class="px-2 pt-4 pb-3">
-                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Real Estate</span>
-                        <h3 class="text-base font-bold text-white mt-1">Spaces That Inspire</h3>
-                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A polished property film highlighting interiors, architectural details and the atmosphere of the space.</p>
-                    </div>
-                </div>
-
-                <div class="video-card saas-3d-card ios-glass group relative rounded-[28px] overflow-hidden p-1.5 flex flex-col" style="--saas-delay: 270ms;" data-video-card>
-                    <div class="relative aspect-[9/16] w-full bg-black rounded-[22px] overflow-hidden">
-                        <video class="w-full h-full object-cover" loop muted playsinline preload="metadata">
-                            <source src="caption_reel.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent transition-opacity duration-300 flex items-center justify-center">
-                            <button type="button" aria-label="Play vertical reel" class="play-trigger w-12 h-12 rounded-full bg-brand-orange/95 text-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
-                                <i class="ph-fill ph-play text-lg ml-0.5 icon-state"></i>
-                            </button>
-                        </div>
-                        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 ios-glass-pill px-2.5 py-1 rounded-full text-[10px] font-mono">
-                            <i class="ph-fill ph-speaker-slash text-neutral-300 sound-icon"></i>
-                            <span class="status-text text-neutral-200">MUTED</span>
-                        </div>
-                    </div>
-                    <div class="px-2 pt-4 pb-3">
-                        <span class="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-semibold">Social Media Reel</span>
-                        <h3 class="text-base font-bold text-white mt-1">Words That Make an Impact</h3>
-                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">A fast-paced caption-led reel with clear typography, engaging rhythm and precise sound sync.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- CLIENT FEEDBACK / TESTIMONIALS SECTION     -->
-    <!-- (STICKY SCROLL STACKING CARDS EFFECT)      -->
-    <!-- ========================================== -->
-    <div class="saas-horizon-beam"></div>
-    <section id="reviews" class="relative py-24 sm:py-32 px-6 bg-brand-dark bg-grain border-b border-white/10">
-        <!-- Ambient iOS Backlight Orbs (Makes the iPhone Frosted Glass Blur Pop as Cards Stack) -->
-        <div class="pointer-events-none absolute inset-0 overflow-hidden">
-            <div class="sticky top-1/3 mx-auto max-w-4xl h-96 flex items-center justify-between px-8 opacity-60">
-                <div class="w-72 h-72 rounded-full bg-brand-orange/25 blur-[110px]"></div>
-                <div class="w-80 h-80 rounded-full bg-indigo-500/20 blur-[120px]"></div>
-                <div class="w-64 h-64 rounded-full bg-amber-400/15 blur-[100px]"></div>
-            </div>
-        </div>
-
-        <div class="relative z-10 max-w-7xl mx-auto">
-            
-            <!-- Header -->
-            <div class="saas-reveal flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-                <div>
-                    <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2.5">
-                        <span>// Client Endorsements</span>
-                        <span class="px-2.5 py-0.5 text-[10px] ios-glass-pill text-brand-orange rounded-full">iOS Glass Stack</span>
-                    </div>
-                    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight">Trusted by Brands &amp; Creators</h2>
-                </div>
-                <p class="text-neutral-400 text-sm sm:text-base max-w-md leading-relaxed">
-                    Real feedback from teams, founders, and creators who trusted Tejs with their post-production workflow.
-                </p>
-            </div>
-
-            <!-- 6 Sticky Scroll-Stacking iPhone Glass Client Feedback Cards -->
-            <div class="stack-cards-container max-w-5xl mx-auto" id="testimonial-stack">
-                
-                <!-- Card 01: Pizzatoons -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 84px; z-index: 10;" data-stack-index="0">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">01 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Animation &amp; Food Brand</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Tejs completely transformed our animated shorts and food promos. His comedic timing, punchy sound effects, and snappy transitions in Premiere Pro boosted our average watch time almost immediately. Super easy to work with!”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-brand-orange text-base">
-                                PZ
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Pizzatoons</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Creative Content Studio</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-                <!-- Card 02: Meta Ninza -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 104px; z-index: 20;" data-stack-index="1">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">02 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Tech &amp; Digital Media</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Finding an editor who understands fast-paced tech content is rare. Tejs nailed our After Effects motion graphics and retention hooks from day one. Our Reels look cleaner, sharper, and consistently outperform our older videos.”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-indigo-300 text-base">
-                                MN
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Meta Ninza</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Digital Brand &amp; Creator</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-                <!-- Card 03: Sahib Kaur -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 124px; z-index: 30;" data-stack-index="2">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">03 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Lifestyle Creator</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Working with Tejs has been a blessing for my content schedule. He knows exactly how to match the vibe, music, and aesthetic I want without me having to over-explain. Fast delivery and zero compromise on quality!”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-pink-300 text-base">
-                                SK
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Sahib Kaur</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Influencer &amp; Public Figure</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-                <!-- Card 04: Wedprisam -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 144px; z-index: 40;" data-stack-index="3">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">04 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Wedding Cinema</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Wedding films require deep emotion, seamless rhythm, and rich color grading. Tejs took hours of our raw multi-cam footage and crafted breathtaking cinematic teasers and reels that left our couples speechless.”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-amber-300 text-base">
-                                WP
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Wedprisam</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Luxury Wedding Films</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-                <!-- Card 05: Vault of Gallery -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 164px; z-index: 50;" data-stack-index="4">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">05 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Visual Curation</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Aesthetic perfection! For Vault of Gallery, every frame needs to look like art. Tejs’s eye for speed-ramping, subtle visual effects, and atmospheric audio design gave our visual reels an unmistakable signature style.”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-emerald-300 text-base">
-                                VG
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Vault of Gallery</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Art &amp; Visual Collective</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-                <!-- Card 06: Raksha Hospitality -->
-                <div class="stack-card p-7 sm:p-10 rounded-[32px]" style="top: 184px; z-index: 60;" data-stack-index="5">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-xs px-3 py-1 rounded-full ios-glass-pill text-brand-orange font-bold">06 / 06</span>
-                            <div class="flex text-brand-orange text-base gap-0.5">
-                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                            </div>
-                        </div>
-                        <span class="text-xs font-mono text-neutral-200 uppercase tracking-wider ios-glass-pill px-3.5 py-1 rounded-full">Hospitality &amp; Hotels</span>
-                    </div>
-                    <p class="text-white/95 text-lg sm:text-2xl font-medium leading-relaxed mb-8">
-                        “Tejs helped us showcase our properties and dining experiences with a truly premium feel. His promotional edits brought out the warmth and luxury of Raksha Hospitality, driving real inquiries from social media.”
-                    </p>
-                    <div class="flex items-center justify-between pt-5 border-t border-white/15">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ios-glass-pill flex items-center justify-center font-bold text-cyan-300 text-base">
-                                RH
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-base sm:text-lg">Raksha Hospitality</h4>
-                                <p class="text-xs sm:text-sm text-neutral-300">Hospitality Brand</p>
-                            </div>
-                        </div>
-                        <i class="ph-duotone ph-quotes text-3xl sm:text-4xl text-white/25"></i>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- CONTACT / WHATSAPP REDIRECT FORM SECTION   -->
-    <!-- ========================================== -->
-    <div class="saas-horizon-beam"></div>
-    <section id="contact" class="saas-perspective-stage py-24 sm:py-32 px-6 bg-[#0A0A0A] relative overflow-hidden">
-        <!-- Ambient Glow Behind iPhone Glass Contact Card -->
-        <div data-saas-parallax="-0.14" class="pointer-events-none absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-brand-orange/20 blur-[130px] will-change-transform"></div>
-        <div data-saas-parallax="0.14" class="pointer-events-none absolute top-16 left-10 w-80 h-80 rounded-full bg-indigo-500/10 blur-[120px] will-change-transform"></div>
-
-        <div class="relative z-10 max-w-7xl mx-auto">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-stretch">
-                
-                <!-- Left Column: Callout & Direct Info -->
-                <div class="saas-reveal lg:col-span-5 flex flex-col justify-between space-y-8">
-                    <div>
-                        <div class="text-brand-orange font-mono text-xs sm:text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <span>// Start a Project</span>
-                            <span class="h-[1px] w-8 bg-brand-orange/40"></span>
-                        </div>
-                        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] text-white">
-                            Let’s Edit Your Next <span class="text-brand-orange">Viral Video.</span>
-                        </h2>
-                        <p class="text-neutral-400 text-sm sm:text-base leading-relaxed mt-4">
-                            Fill out the project brief and your details will be formatted and sent directly to my WhatsApp so we can discuss your timeline, style references, and deliverables immediately.
-                        </p>
-                    </div>
-
-                    <!-- Aligned Direct Contact Info Cards -->
-                    <div class="space-y-3.5">
-                        <!-- WhatsApp Direct -->
-                        <a href="https://wa.me/917020071100" target="_blank" rel="noopener noreferrer" class="ios-glass-pill p-4 rounded-2xl flex items-center justify-between group hover:border-brand-orange/60 transition">
-                            <div class="flex items-center gap-4">
-                                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl shrink-0">
-                                    <i class="ph-fill ph-whatsapp-logo"></i>
-                                </div>
-                                <div>
-                                    <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Direct WhatsApp</div>
-                                    <div class="text-sm sm:text-base font-bold text-white group-hover:text-brand-orange transition">+91 7020071100</div>
-                                </div>
-                            </div>
-                            <i class="ph ph-arrow-up-right text-lg text-neutral-400 group-hover:text-brand-orange group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"></i>
-                        </a>
-
-                        <!-- Location -->
-                        <div class="ios-glass-pill p-4 rounded-2xl flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl bg-brand-orange/15 border border-brand-orange/30 text-brand-orange flex items-center justify-center text-xl shrink-0">
-                                <i class="ph-fill ph-map-pin"></i>
-                            </div>
-                            <div>
-                                <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Base Location</div>
-                                <div class="text-sm sm:text-base font-semibold text-white">Washim, Maharashtra, India</div>
-                            </div>
-                        </div>
-
-                        <!-- Software & Turnaround -->
-                        <div class="ios-glass-pill p-4 rounded-2xl flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl shrink-0">
-                                <i class="ph-fill ph-film-slate"></i>
-                            </div>
-                            <div>
-                                <div class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Post-Production Workflow</div>
-                                <div class="text-sm font-medium text-neutral-200">Premiere Pro • After Effects • CapCut PC</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: WhatsApp Lead Form (iPhone Frosted Glass Panel) -->
-                <div class="saas-3d-card lg:col-span-7 ios-glass p-6 sm:p-10 rounded-[32px] flex flex-col justify-between" style="--saas-delay: 140ms;">
-                    <div class="mb-6 pb-4 border-b border-white/10 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-white">Project Inquiry Form</h3>
-                            <p class="text-xs text-neutral-400 mt-0.5">Instant redirect to WhatsApp chat (+91 7020071100)</p>
-                        </div>
-                        <span class="px-3 py-1 rounded-full ios-glass-pill text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            Online
-                        </span>
-                    </div>
-
-                    <form id="whatsapp-form" class="space-y-5">
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Name -->
-                            <div class="flex flex-col">
-                                <label for="client-name" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
-                                    Your Name <span class="text-brand-orange">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="client-name" 
-                                    required 
-                                    placeholder="e.g. Rahul Sharma"
-                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
-                                />
-                            </div>
-
-                            <!-- Email -->
-                            <div class="flex flex-col">
-                                <label for="client-email" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
-                                    Email Address <span class="text-brand-orange">*</span>
-                                </label>
-                                <input 
-                                    type="email" 
-                                    id="client-email" 
-                                    required 
-                                    placeholder="e.g. rahul@brand.com"
-                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Instagram ID (Optional) -->
-                            <div class="flex flex-col">
-                                <label for="client-insta" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
-                                    Instagram ID <span class="text-neutral-500">(Optional)</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="client-insta" 
-                                    placeholder="e.g. @yourhandle"
-                                    class="w-full h-12 ios-glass-input rounded-2xl px-4 text-sm text-white placeholder-neutral-500 outline-none transition"
-                                />
-                            </div>
-
-                            <!-- Video Type -->
-                            <div class="flex flex-col">
-                                <label for="project-type" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
-                                    Service Needed
-                                </label>
-                                <div class="relative">
-                                    <select 
-                                        id="project-type"
-                                        class="w-full h-12 ios-glass-input rounded-2xl px-4 pr-10 text-sm text-white outline-none transition bg-[#141414]/90 appearance-none"
-                                    >
-                                        <option value="Instagram Reels / YouTube Shorts" class="bg-[#141414] text-white">Vertical Reels / Shorts (9:16)</option>
-                                        <option value="YouTube Long-Form Video" class="bg-[#141414] text-white">Horizontal YouTube / Documentary (16:9)</option>
-                                        <option value="Motion Graphics & VFX" class="bg-[#141414] text-white">After Effects Motion Graphics</option>
-                                        <option value="Wedding / Event Highlight" class="bg-[#141414] text-white">Wedding / Event Highlight</option>
-                                        <option value="Monthly Retainer Package" class="bg-[#141414] text-white">Monthly Retainer Package</option>
-                                    </select>
-                                    <i class="ph ph-caret-down text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Message -->
-                        <div class="flex flex-col">
-                            <label for="client-message" class="block text-xs font-mono uppercase tracking-wider text-neutral-300 mb-2">
-                                Project Details / Message <span class="text-brand-orange">*</span>
-                            </label>
-                            <textarea 
-                                id="client-message" 
-                                rows="4" 
-                                required
-                                placeholder="Tell me about your videos, reference style, or timeline..."
-                                class="w-full ios-glass-input rounded-2xl p-4 text-sm text-white placeholder-neutral-500 outline-none transition resize-none"
-                            ></textarea>
-                        </div>
-
-                        <!-- Submit to WhatsApp Button -->
-                        <button 
-                            type="submit" 
-                            class="w-full h-14 ios-glass-pill bg-brand-orange/90 hover:bg-brand-orange text-white font-bold px-6 rounded-2xl flex items-center justify-center gap-3 transition duration-300 shadow-lg shadow-brand-orange/30"
-                        >
-                            <i class="ph-fill ph-whatsapp-logo text-xl"></i>
-                            <span>Send Inquiry to Tejs on WhatsApp</span>
-                        </button>
-
-                        <!-- Status Notification Box (No alert()) -->
-                        <div id="form-feedback" class="hidden p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center justify-between">
-                            <span>Redirecting your details to WhatsApp (+91 7020071100)...</span>
-                            <a id="fallback-wa-link" href="#" target="_blank" class="underline font-bold">Open manually</a>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-[#060606] border-t border-white/10 py-8 px-6 text-xs text-neutral-500">
-        <div class="max-w-7xl mx-auto ios-glass-pill px-6 py-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="text-neutral-300">© 2026 Tejs — Video Editor &amp; Cinematographer (Washim, Maharashtra). All rights reserved.</div>
-            <div class="font-mono text-brand-orange">Adobe Premiere Pro • After Effects • CapCut PC</div>
-        </div>
-    </footer>
-
-    <!-- ========================================== -->
-    <!-- INTERACTIVE SCRIPTS                        -->
-    <!-- ========================================== -->
-    <script>
-        // 0A. 60FPS KINETIC HERO TITLE PARALLAX ("Tejs Edits")
-        const heroStage = document.getElementById('hero-stage');
-        const heroKineticTitle = document.getElementById('hero-kinetic-title');
-
-        if (heroStage && heroKineticTitle) {
-            let targetTitleX = 0, targetTitleY = 0;
-            let currentTitleX = 0, currentTitleY = 0;
-
-            heroStage.addEventListener('mousemove', (e) => {
-                const rect = heroStage.getBoundingClientRect();
-                const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-                const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-                targetTitleX = normX * 18;
-                targetTitleY = normY * 10;
-            });
-
-            heroStage.addEventListener('mouseleave', () => {
-                targetTitleX = 0;
-                targetTitleY = 0;
-            });
-
-            function animateHeroTitle60fps() {
-                currentTitleX += (targetTitleX - currentTitleX) * 0.1;
-                currentTitleY += (targetTitleY - currentTitleY) * 0.1;
-                heroKineticTitle.style.transform = `translate3d(${currentTitleX.toFixed(2)}px, ${currentTitleY.toFixed(2)}px, 0)`;
-                requestAnimationFrame(animateHeroTitle60fps);
-            }
-            requestAnimationFrame(animateHeroTitle60fps);
-        }
-
-        // 0. APPLE LIQUID GLASS DYNAMIC SPECULAR LIGHT TRACKER
-        document.querySelectorAll('.ios-glass, .stack-card').forEach(glassEl => {
-            glassEl.addEventListener('mousemove', (e) => {
-                const rect = glassEl.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                glassEl.style.setProperty('--liquid-mx', `${x.toFixed(1)}%`);
-                glassEl.style.setProperty('--liquid-my', `${y.toFixed(1)}%`);
-            });
-        });
-
-        // 1. NLE EDITING TIMELINE SCROLL & SCRUBBING LOGIC
-        const timecodeDisplay = document.getElementById('timecode-display');
-        const timelineProgress = document.getElementById('timeline-progress');
-        const timelinePlayhead = document.getElementById('timeline-playhead');
-        const timelineScrubber = document.getElementById('timeline-scrubber');
-
-        function formatSMPTE(scrollPercent) {
-            // Simulate a 3-minute master sequence at 60fps
-            const totalFrames = Math.floor(scrollPercent * 10800); 
-            const frames = totalFrames % 60;
-            const totalSeconds = Math.floor(totalFrames / 60);
-            const seconds = totalSeconds % 60;
-            const minutes = Math.floor(totalSeconds / 60) % 60;
-
-            const pad = (n) => String(n).padStart(2, '0');
-            return `00:${pad(minutes)}:${pad(seconds)}:${pad(frames)}`;
-        }
-
-        function updateTimelineOnScroll() {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrollPercent = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
-            const pctString = (scrollPercent * 100).toFixed(2) + '%';
-
-            timelineProgress.style.width = pctString;
-            timelinePlayhead.style.left = pctString;
-            timecodeDisplay.textContent = formatSMPTE(scrollPercent);
-        }
-
-        window.addEventListener('scroll', updateTimelineOnScroll, { passive: true });
-        updateTimelineOnScroll();
-
-        // Allow clicking on the NLE timeline bar to scrub the page
-        timelineScrubber.addEventListener('click', (e) => {
-            const rect = timelineScrubber.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const ratio = Math.min(Math.max(clickX / rect.width, 0), 1);
-            const targetScroll = ratio * (document.documentElement.scrollHeight - document.documentElement.clientHeight);
-            window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-        });
-
-        // 2. VIDEO HOVER PLAY/UNMUTE + MOBILE TAP PLAY BUTTON
-        const videoCards = document.querySelectorAll('[data-video-card]');
-
-        function stopAllOtherVideos(currentVideo) {
-            videoCards.forEach(card => {
-                const vid = card.querySelector('video');
-                if (vid !== currentVideo) {
-                    pauseAndMuteCard(card);
-                }
-            });
-        }
-
-        function playAndUnmuteCard(card) {
-            const video = card.querySelector('video');
-            const syncVideo = card.querySelector('.ba-sync-video');
-            const iconState = card.querySelector('.icon-state');
-            const soundIcon = card.querySelector('.sound-icon');
-            const statusText = card.querySelector('.status-text');
-            const playTrigger = card.querySelector('.play-trigger');
-
-            stopAllOtherVideos(video);
-
-            video.muted = false;
-            const playPromise = video.play();
-            if (syncVideo) {
-                syncVideo.currentTime = video.currentTime;
-                syncVideo.play().catch(() => {});
-            }
-
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    // Successfully playing with audio
-                    iconState.className = 'ph-fill ph-pause text-2xl icon-state';
-                    soundIcon.className = 'ph-fill ph-speaker-high text-brand-orange sound-icon';
-                    statusText.textContent = 'PLAYING • AUDIO ON';
-                    playTrigger.classList.add('opacity-0', 'sm:group-hover:opacity-0');
-                }).catch(() => {
-                    // Browser blocked unmuted hover autoplay before user interaction; fallback to muted play
-                    video.muted = true;
-                    video.play().catch(() => {});
-                    iconState.className = 'ph-fill ph-speaker-simple-high text-2xl icon-state';
-                    soundIcon.className = 'ph-fill ph-speaker-slash text-amber-400 sound-icon';
-                    statusText.textContent = 'TAP FOR AUDIO';
-                });
-            }
-        }
-
-        function pauseAndMuteCard(card) {
-            const video = card.querySelector('video');
-            const syncVideo = card.querySelector('.ba-sync-video');
-            const iconState = card.querySelector('.icon-state');
-            const soundIcon = card.querySelector('.sound-icon');
-            const statusText = card.querySelector('.status-text');
-            const playTrigger = card.querySelector('.play-trigger');
-
-            video.pause();
-            video.muted = true;
-            if (syncVideo) syncVideo.pause();
-            iconState.className = 'ph-fill ph-play text-2xl ml-0.5 icon-state';
-            soundIcon.className = 'ph-fill ph-speaker-slash text-neutral-400 sound-icon';
-            statusText.textContent = 'MUTED • PAUSED';
-            playTrigger.classList.remove('opacity-0');
-        }
-
-        videoCards.forEach(card => {
-            const video = card.querySelector('video');
-            const playBtn = card.querySelector('.play-trigger');
-
-            // Desktop Hover: Play & Unmute on mouseenter, Pause & Mute on mouseleave
-            card.addEventListener('mouseenter', () => {
-                if (window.matchMedia('(hover: hover)').matches) {
-                    playAndUnmuteCard(card);
-                }
-            });
-
-            card.addEventListener('mouseleave', () => {
-                if (window.matchMedia('(hover: hover)').matches) {
-                    pauseAndMuteCard(card);
-                }
-            });
-
-            // Mobile & Desktop Tap/Click on Play Button or Card (Ignore clicks on Before/After controls)
-            card.addEventListener('click', (e) => {
-                if (e.target.closest('.ba-switch-group') || e.target.classList.contains('ba-range-slider')) {
-                    return;
-                }
-                e.preventDefault();
-                if (video.paused || video.muted) {
-                    playAndUnmuteCard(card);
-                } else {
-                    pauseAndMuteCard(card);
-                }
-            });
-        });
-
-        // 2B. BEFORE / AFTER SPLIT SLIDER & INSTANT TOGGLE LOGIC FOR REELS
-        document.querySelectorAll('[data-ba-split-card]').forEach(card => {
-            const slider = card.querySelector('.ba-range-slider');
-            const beforeLayer = card.querySelector('.ba-before-layer');
-            const dividerLine = card.querySelector('.ba-divider-line');
-
-            if (slider && beforeLayer && dividerLine) {
-                slider.addEventListener('input', (e) => {
-                    const val = e.target.value;
-                    beforeLayer.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
-                    dividerLine.style.left = `${val}%`;
-                });
-            }
-        });
-
-        document.querySelectorAll('[data-ba-toggle-card]').forEach(card => {
-            const targetVideo = card.querySelector('.ba-target-video');
-            const rawHud = card.querySelector('.ba-raw-hud');
-            const buttons = card.querySelectorAll('.ba-btn');
-
-            buttons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const mode = btn.getAttribute('data-ba-mode');
-
-                    buttons.forEach(b => {
-                        b.classList.remove('bg-brand-orange', 'text-white', 'font-bold');
-                        b.classList.add('text-neutral-400');
-                    });
-                    btn.classList.add('bg-brand-orange', 'text-white', 'font-bold');
-                    btn.classList.remove('text-neutral-400');
-
-                    if (mode === 'before') {
-                        targetVideo.classList.remove('graded-footage-look');
-                        targetVideo.classList.add('raw-footage-look');
-                        if (rawHud) rawHud.classList.remove('hidden');
-                        // Mute audio in "Before (Raw)" mode to demonstrate SFX impact in "After"
-                        targetVideo.muted = true;
-                    } else {
-                        targetVideo.classList.remove('raw-footage-look');
-                        targetVideo.classList.add('graded-footage-look');
-                        if (rawHud) rawHud.classList.add('hidden');
-                        if (!targetVideo.paused) targetVideo.muted = false;
-                    }
-                });
-            });
-        });
-
-        // 3. WHATSAPP REDIRECT FORM (+91 7020071100)
-        const whatsappForm = document.getElementById('whatsapp-form');
-        const formFeedback = document.getElementById('form-feedback');
-        const fallbackWaLink = document.getElementById('fallback-wa-link');
-
-        whatsappForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('client-name').value.trim();
-            const email = document.getElementById('client-email').value.trim();
-            const insta = document.getElementById('client-insta').value.trim() || 'Not provided';
-            const service = document.getElementById('project-type').value;
-            const message = document.getElementById('client-message').value.trim();
-
-            const whatsappNumber = '917020071100';
-
-            const formattedText = 
-                `*New Portfolio Inquiry for Tejs*%0A%0A` +
-                `*Name:* ${encodeURIComponent(name)}%0A` +
-                `*Email:* ${encodeURIComponent(email)}%0A` +
-                `*Instagram:* ${encodeURIComponent(insta)}%0A` +
-                `*Service:* ${encodeURIComponent(service)}%0A` +
-                `*Project Details:* ${encodeURIComponent(message)}`;
-
-            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${formattedText}`;
-
-            // Show inline confirmation and open WhatsApp
-            fallbackWaLink.href = whatsappURL;
-            formFeedback.classList.remove('hidden');
-
-            window.open(whatsappURL, '_blank', 'noopener,noreferrer');
-        });
-
-        // 4. CUSTOM DUAL-CIRCLE FOLLOWER CURSOR (Matches Reference Image)
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorRing = document.getElementById('cursor-ring');
-
-        if (cursorDot && cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-            let mouseX = window.innerWidth / 2;
-            let mouseY = window.innerHeight / 2;
-            let ringX = mouseX;
-            let ringY = mouseY;
-
-            window.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                // Center dot tracks immediately
-                cursorDot.style.left = `${mouseX}px`;
-                cursorDot.style.top = `${mouseY}px`;
-            });
-
-            // Smooth trailing interpolation for the outer ring
-            function animateCursorRing() {
-                ringX += (mouseX - ringX) * 0.18;
-                ringY += (mouseY - ringY) * 0.18;
-                cursorRing.style.left = `${ringX}px`;
-                cursorRing.style.top = `${ringY}px`;
-                requestAnimationFrame(animateCursorRing);
-            }
-            requestAnimationFrame(animateCursorRing);
-
-            // Expand ring on interactive elements
-            const interactiveSelectors = 'a, button, input, select, textarea, [data-video-card], #timeline-scrubber, .stack-card';
-            document.querySelectorAll(interactiveSelectors).forEach((el) => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-            });
-        }
-
-        // 5. STICKY SCROLL STACKING CARDS DEPTH SCALE EFFECT
-        const stackCards = document.querySelectorAll('.stack-card');
-
-        function updateCardStackDepth() {
-            stackCards.forEach((card, index) => {
-                const nextCard = stackCards[index + 1];
-                if (!nextCard) return;
-
-                const cardRect = card.getBoundingClientRect();
-                const nextRect = nextCard.getBoundingClientRect();
-                const stickyTop = parseFloat(card.style.top) || 84;
-
-                // When the card is pinned at its sticky offset and the next card scrolls up over it
-                if (cardRect.top <= stickyTop + 5) {
-                    const distance = Math.max(0, nextRect.top - stickyTop);
-                    const maxDistance = 360;
-                    const overlapRatio = 1 - Math.min(distance / maxDistance, 1);
-
-                    const scale = 1 - (overlapRatio * 0.045); // Subtle scale down as cards stack on top
-                    const brightness = 1 - (overlapRatio * 0.28);
-                    card.style.transform = `scale(${scale.toFixed(4)})`;
-                    card.style.filter = `brightness(${brightness.toFixed(3)})`;
-                } else {
-                    card.style.transform = 'scale(1)';
-                    card.style.filter = 'brightness(1)';
-                }
-            });
-        }
-
-        window.addEventListener('scroll', updateCardStackDepth, { passive: true });
-        updateCardStackDepth();
-
-        // 6. MODERN SAAS SCROLL REVEAL, 3D CARD ENTRANCE & PARALLAX ORBS
-        const saasAnimatedElements = document.querySelectorAll('.saas-reveal, .saas-3d-card');
-
-        if ('IntersectionObserver' in window) {
-            const saasObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-inview');
-                    } else if (entry.boundingClientRect.top > 0) {
-                        // Reset smoothly when scrolling back above the element so scrolling down replays the SaaS entrance
-                        entry.target.classList.remove('is-inview');
-                    }
-                });
-            }, {
-                threshold: 0.12,
-                rootMargin: '0px 0px -40px 0px'
-            });
-
-            saasAnimatedElements.forEach((el) => saasObserver.observe(el));
-        } else {
-            saasAnimatedElements.forEach((el) => el.classList.add('is-inview'));
-        }
-
-        // Scroll-Linked Parallax for Ambient Liquid Glass Orbs & Hero Depth
-        const parallaxOrbs = document.querySelectorAll('[data-saas-parallax]');
-        let saasScrollTicking = false;
-
-        function updateSaasScrollParallax() {
-            const scrollY = window.scrollY || window.pageYOffset;
-
-            parallaxOrbs.forEach((orb) => {
-                const speed = parseFloat(orb.getAttribute('data-saas-parallax')) || 0.1;
-                const yOffset = scrollY * speed;
-                orb.style.transform = `translate3d(0, ${yOffset.toFixed(1)}px, 0)`;
-            });
-
-            saasScrollTicking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            if (!saasScrollTicking) {
-                requestAnimationFrame(updateSaasScrollParallax);
-                saasScrollTicking = true;
-            }
-        }, { passive: true });
-    </script>
+  </div>
+</section>
+
+<section id="contact"><i class="orb" data-p=".12" style="top:10%;left:-6%"></i>
+  <div class="ct">
+    <div>
+      <div class="mono" data-r="Tag">03 / Start a Project</div>
+      <h2 class="hd an" data-r="Heading" style="margin-top:14px">Let’s work<br><span class="red">together.</span></h2>
+      <ul data-r="Details"><li><small class="mono">Direct WhatsApp</small><a href="https://wa.me/917020071100" target="_blank" rel="noopener">+91 7020071100</a></li>
+      <li><small class="mono">Base Location</small>Washim, Maharashtra, India</li>
+      <li><small class="mono">Post-Production Workflow</small>Premiere Pro • After Effects • CapCut PC</li></ul>
+    </div>
+    <form id="f" data-r="Form">
+      <input name="n" placeholder="Your Name *" required><input name="e" type="email" placeholder="Email Address *" required><input name="i" placeholder="Instagram ID (Optional)">
+      <select name="s"><option>Vertical Reels / Shorts (9:16)</option><option>Horizontal YouTube / Documentary (16:9)</option><option>After Effects Motion Graphics</option><option>Wedding / Event Highlight</option><option>Monthly Retainer Package</option></select>
+      <textarea name="m" rows="4" placeholder="Project Details / Message *" required></textarea>
+      <button>Send Inquiry to Tejs on WhatsApp →</button>
+    </form>
+  </div>
+</section>
+<footer>© 2026 Tejs — Video Editor &amp; Cinematographer (Washim, Maharashtra). All rights reserved.</footer>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],R=Math.random;
+const ed=$('#ed'),cu=$('#cur'),vw=()=>innerWidth,vh=()=>innerHeight;
+
+/* giant PORTFOLIO letters */
+$('#pf').innerHTML=[...'PORTFOLIO'].map((c,i)=>`<span style="--i:${i}">${c}</span>`).join('');
+$('#mq').innerHTML=['Pizzatoons','Meta Ninza','Sahib Kaur','Wedprisam','Vault of Gallery','Raksha Hospitality'].map(x=>`<span>${x}</span>`).join('').repeat(2);
+/* ✏️ EDIT HERE — your original 4+4 are first; slots 5–8 are ready — paste your file name into src:'' (empty src shows a placeholder) */
+const SHOW={
+ h:[{src:"meta ninza_1.mp4",name:"Cinematic Brand Story",tag:"Brand Film",tool:"Pr + Ae"},{src:"VJ Event_2.mp4",name:"Royal Wedding Aftermovie",tag:"Wedding &amp; Events",tool:"Premiere Pro"},{src:"6MONTH BABY demo_1.mp4",name:"6-Month Celebration Film",tag:"Family Film",tool:"Pr + Ae"},{src:"BTS.mp4",name:"Creative Production BTS",tag:"Behind the Scenes",tool:"After Effects"}
+ ,{src:'',name:'Vision in Motion',tag:'Corporate Film',tool:'Premiere Pro'}
+ ,{src:'',name:'Crafted to Be Noticed',tag:'Product Ad',tool:'Pr + Ae'}
+ ,{src:'',name:'Stories Worth Telling',tag:'Documentary',tool:'Premiere Pro'}
+ ,{src:'',name:'Design in Motion',tag:'Motion Graphics',tool:'After Effects'}
+ ],
+ v:[{src:"car_delivery.mp4",name:"Luxury on the Move",tag:"Automotive Film",desc:"A cinematic automotive edit with dynamic framing, refined pacing and impactful sound design."},{src:"Lambo.mp4",name:"Lamborghini — Pure Performance",tag:"Automotive Showcase",desc:"A high-energy supercar showcase built around bold visuals, smooth transitions and beat-synced cuts."},{src:"real_estate.mp4",name:"Spaces That Inspire",tag:"Real Estate",desc:"A polished property film highlighting interiors, architectural details and the atmosphere of the space."},{src:"caption_reel.mp4",name:"Words That Make an Impact",tag:"Social Media Reel",desc:"A fast-paced caption-led reel with clear typography, engaging rhythm and precise sound sync."}
+ ,{src:'',name:'Style in Every Frame',tag:'Fashion Reel',desc:'A stylish fashion reel with sharp cuts, smooth speed ramps and rhythm-driven transitions.'}
+ ,{src:'',name:'Taste the Moment',tag:'Food & Cafe',desc:'A mouth-watering food reel with close-up detail, warm color grading and crisp sound design.'}
+ ,{src:'',name:'Moments That Move',tag:'Event Teaser',desc:'A high-energy event teaser built around crowd moments, beat-synced cuts and bold visual effects.'}
+ ,{src:'',name:'Made to Stand Out',tag:'Product Reel',desc:'A clean product showcase with dynamic motion graphics, polished transitions and punchy pacing.'}
+ ]};
+const cap=(o,k)=>!o.name?'':k=='h'?`<div class="ov"><div><span class="tg">${o.tag}</span><h3>${o.name}</h3></div><span class="pill mono">${o.tool}</span></div>`:`<figcaption><span class="mono red">${o.tag}</span><h3>${o.name}</h3><p>${o.desc}</p></figcaption>`;
+['h','v'].forEach(k=>$('#r'+k).innerHTML=SHOW[k].map((o,i)=>`<figure class="cd${o.src?'':' nov'}" data-r="${k=='h'?'Clip':'Reel'} 0${i+1}"><div class="px"></div><video muted loop playsinline preload="metadata" ${o.src?`src="${o.src}"`:''} onerror="this.parentNode.classList.add('nov')"></video><span class="tc mono">${k=='h'?'16:9':'9:16'} • 0${i+1}</span>${cap(o,k)}</figure>`).join(''));
+$$('.px').forEach(p=>{for(let i=0;i<(p.parentNode.parentNode.classList.contains('v')?36:40);i++)p.insertAdjacentHTML('beforeend',`<i style="--d:${R()*700|0}ms"></i>`)});
+
+/* cursors: swarm only during the intro; afterwards they move ONLY when the visitor scrolls */
+const COL=['#ffffff','#5eead4','#f472b6','#fbbf24','#60a5fa','#c4b5fd','#fb7185','#a3e635'];
+const CUR=22; /* cursor height in px — same as a real OS pointer; raise/lower to taste */
+let mode=0,lastS=-1,lenis=null;
+if(window.Lenis&&!matchMedia('(prefers-reduced-motion:reduce)').matches){lenis=new Lenis({lerp:.085,wheelMultiplier:.9});lenis.stop()}
+const cs=[...Array(14)].map((_,i)=>{const e=document.createElement('i');
+  e.innerHTML=`<svg width="${CUR*15/22|0}" height="${CUR}" viewBox="0 0 15 22"><path d="M1 1V18L5.2 14.2L8 21L10.8 19.8L8.1 13.2H13.5Z" fill="${i%2?COL[i%8]:'#fff'}" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
+  cu.append(e);return{e,x:vw()*(.35+R()*.3),y:vh()*(.35+R()*.3),tx:vw()/2,ty:vh()/2,k:.04+R()*.05,lock:0,ph:R()*6.3,fx:.6+R()*.9,fy:.6+R()*.9,bx:0,by:0,s0:0}});
+const ox=(c,s)=>Math.sin(s*.0013*c.fx+c.ph)*vw()*.32,oy=(c,s)=>Math.cos(s*.001*c.fy+c.ph)*vh()*.3;
+const swarm=()=>cs.forEach(c=>{c.tx=vw()/2+(R()-.5)*260;c.ty=vh()/2+(R()-.5)*200});
+function scrollFx(s){
+  $('#pl').style.height=(s/Math.max(1,document.body.scrollHeight-vh())*100)+'vh';
+  $('.pf').style.translate=`0 ${s*.28}px`;$('.ph').style.translate=`0 ${s*.1}px`;$('.st').style.translate=`0 ${s*.15}px`;
+  const h=$('.hl');h.style.translate=`0 ${s*.2}px`;h.style.opacity=Math.max(0,1-s/(vh()*.8));
+  $$('.cd video').forEach(v=>{const r=v.parentNode.getBoundingClientRect();v.style.translate=`0 ${(r.top+r.height/2-vh()/2)*-.06}px`});
+  $$('.orb').forEach(o=>o.style.translate=`0 ${o.parentNode.getBoundingClientRect().top*o.dataset.p}px`)}
+requestAnimationFrame(function tick(t){
+  lenis&&lenis.raf(t);const s=scrollY;
+  if(mode)cs.forEach(c=>{if(!c.lock){c.tx=Math.min(vw()-20,Math.max(8,c.bx+ox(c,s)-ox(c,c.s0)));c.ty=Math.min(vh()-24,Math.max(8,c.by+oy(c,s)-oy(c,c.s0)))}});
+  cs.forEach(c=>{c.x+=(c.tx-c.x)*c.k;c.y+=(c.ty-c.y)*c.k;c.e.style.transform=`translate(${c.x}px,${c.y}px)`});
+  if(s!==lastS){lastS=s;scrollFx(s)}
+  requestAnimationFrame(tick)});
+
+/* editor selection box: wraps a real element, cursors drag to its corners, then content snaps in */
+function edit(el,label,d=0,fill=0){
+  setTimeout(()=>{
+    const r=el.getBoundingClientRect();
+    if(r.width&&r.bottom>0&&r.top<vh()){
+      const b=document.createElement('div');b.className='sel'+(fill?' fill':'');
+      b.style.cssText=`left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`;
+      b.innerHTML='<u></u>'.repeat(8)+`<b>${label} ${r.width|0} × ${r.height|0}</b>`;ed.append(b);setTimeout(()=>b.remove(),1750);
+      [[r.right,r.bottom],[r.left,r.top]].forEach(p=>{const c=cs[R()*cs.length|0];c.lock=1;c.tx=p[0];c.ty=p[1];setTimeout(()=>c.lock=0,1500)});
+    }
+    setTimeout(()=>el.classList.add('on'),520);
+  },d);
+}
+
+/* intro: swarm -> editor wireframe builds hero -> dissolve into live page */
+function guides(){for(let i=0;i<7;i++){const g=document.createElement('div');g.className='g '+(i%2?'h':'v');
+  g.style[i%2?'top':'left']=(R()*(i%2?vh():vw()))+'px';g.style.animationDelay=R()*500+'ms';ed.append(g)}
+  for(let i=0;i<9;i++){const c=document.createElement('div');c.className='ch';c.textContent='+';c.style.cssText=`left:${R()*vw()}px;top:${R()*vh()}px;animation-delay:${R()*700}ms`;ed.append(c)}}
+function intro(){
+  const parts=[['.hi','Text'],['.nm','Heading'],['.rl','Role'],['.pg','Paragraph'],['.cta','Button'],['.loc','Location'],['.st','Stats']];
+  swarm();setTimeout(swarm,450);
+  setTimeout(()=>{$('#intro').classList.add('out');guides()},900);
+  setTimeout(()=>edit($('.ph'),'Frame',0,1),1000);
+  parts.forEach((p,i)=>edit($(p[0]),p[1],1250+i*170));
+  setTimeout(()=>$('#pf').classList.add('on'),2000);
+  setTimeout(()=>{$$('#hero [data-r]').forEach(e=>e.classList.add('on'));countUp()},3000);
+  setTimeout(()=>cs.forEach(c=>{if(!c.lock){c.tx=R()*vw();c.ty=R()*vh()}}),2400);
+  setTimeout(()=>lenis&&lenis.start(),3000);
+  setTimeout(()=>{cs.forEach(c=>{c.lock=0;c.bx=c.tx;c.by=c.ty;c.s0=scrollY});mode=1},3900);
+}
+/* scroll sections reuse the same build animation */
+function boot(){
+  const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){io.unobserve(en.target);
+    const d=en.target.matches('.cd,.it')?[...en.target.parentNode.children].indexOf(en.target)%4*140:0;edit(en.target,en.target.dataset.r,d)}}),{threshold:.25});
+  $$('section [data-r]').forEach(e=>io.observe(e));
+}
+function countUp(){$$('.n').forEach(n=>{const t=+n.dataset.n,s=performance.now();(function f(now){const p=Math.min((now-s)/1200,1);n.textContent=Math.round(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(s)})}
+
+/* video hover play / unmute, progress line, WhatsApp form */
+$$('.cd').forEach(c=>{const v=$('video',c);c.onmouseenter=()=>{v.muted=false;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})};c.onmouseleave=()=>{v.pause();v.muted=true}});
+$$('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=$(a.getAttribute('href'));lenis?lenis.scrollTo(t,{duration:1.5}):t.scrollIntoView({behavior:'smooth'})});
+$('#f').onsubmit=e=>{e.preventDefault();const f=e.target,t=`*New Project Inquiry*%0AName: ${f.n.value}%0AEmail: ${f.e.value}%0AInstagram: ${f.i.value||'-'}%0AService: ${f.s.value}%0AMessage: ${f.m.value}`;
+  open('https://wa.me/917020071100?text='+t.replace(/ /g,'%20'),'_blank')};
+if(matchMedia('(prefers-reduced-motion:reduce)').matches){countUp()}else{intro();boot()}
+</script>
 </body>
 </html>
