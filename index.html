@@ -191,16 +191,16 @@ $('#mq').innerHTML=['Pizzatoons','Meta Ninza','Sahib Kaur','Wedprisam','Vault of
 /* ✏️ EDIT HERE — your original 4+4 are first; slots 5–8 are ready — paste your file name into src:'' (empty src shows a placeholder) */
 const SHOW={
  h:[{src:"meta ninza_1.mp4",name:"Cinematic Brand Story",tag:"Brand Film",tool:"Pr + Ae"},{src:"VJ Event_2.mp4",name:"Royal Wedding Aftermovie",tag:"Wedding &amp; Events",tool:"Premiere Pro"},{src:"6MONTH BABY demo_1.mp4",name:"6-Month Celebration Film",tag:"Family Film",tool:"Pr + Ae"},{src:"BTS.mp4",name:"Creative Production BTS",tag:"Behind the Scenes",tool:"After Effects"}
- ,{src:'',name:'Luxury Wedding Edit',tag:'Wedding Film',tool:'Premiere Pro'}
- ,{src:'',name:'Free Fire Player Introduction',tag:'Gaming Edit',tool:'Pr + Ae'}
+ ,{src:'Luxury Wedding Edit.mp4',name:'Luxury Wedding Edit',tag:'Wedding Film',tool:'Premiere Pro'}
+ ,{src:'TOTAL GAMING INTRODUCTION.mp4',name:'Free Fire Player Introduction',tag:'Gaming Edit',tool:'Pr + Ae'}
  ,{src:'',name:'Stories Worth Telling',tag:'Documentary',tool:'Premiere Pro'}
  ,{src:'',name:'Design in Motion',tag:'Motion Graphics',tool:'After Effects'}
  ],
  v:[{src:"car_delivery.mp4",name:"Luxury on the Move",tag:"Automotive Film",desc:"A cinematic automotive edit with dynamic framing, refined pacing and impactful sound design."},{src:"Lambo.mp4",name:"Lamborghini — Pure Performance",tag:"Automotive Showcase",desc:"A high-energy supercar showcase built around bold visuals, smooth transitions and beat-synced cuts."},{src:"real_estate.mp4",name:"Spaces That Inspire",tag:"Real Estate",desc:"A polished property film highlighting interiors, architectural details and the atmosphere of the space."},{src:"caption_reel.mp4",name:"Words That Make an Impact",tag:"Social Media Reel",desc:"A fast-paced caption-led reel with clear typography, engaging rhythm and precise sound sync."}
- ,{src:'',name:'Burgertoons Opening Edit',tag:'Animated Content',desc:'A fun, high-energy opening edit with snappy transitions, comic timing and sound design that hooks viewers from the very first second.'}
- ,{src:'',name:'Raksha Hospitality',tag:'Hospitality Brand',desc:'A premium promotional edit showcasing properties and dining experiences with warm tones, smooth movement and a luxury feel.'}
+ ,{src:'burgertoons_opening.mp4',name:'Burgertoons Opening Edit',tag:'Animated Content',desc:'A fun, high-energy opening edit with snappy transitions, comic timing and sound design that hooks viewers from the very first second.'}
+ ,{src:'kashmiri.mp4',name:'Raksha Hospitality',tag:'Hospitality Brand',desc:'A premium promotional edit showcasing properties and dining experiences with warm tones, smooth movement and a luxury feel.'}
  ,{src:'',name:'AI Generated Motion Design',tag:'AI Motion Design',desc:'An AI-generated motion design piece blending futuristic visuals, fluid animation and rhythm-driven transitions.'}
- ,{src:'',name:'Real Estate Marble AI Generated',tag:'Real Estate • AI',desc:'An AI-generated real estate showcase featuring elegant marble interiors, cinematic camera moves and a polished luxury finish.'}
+ ,{src:'marbel_ai.mp4',name:'Real Estate Marble AI Generated',tag:'Real Estate • AI',desc:'An AI-generated real estate showcase featuring elegant marble interiors, cinematic camera moves and a polished luxury finish.'}
  ]};
 const cap=(o,k)=>!o.name?'':k=='h'?`<div class="ov"><div><span class="tg">${o.tag}</span><h3>${o.name}</h3></div><span class="pill mono">${o.tool}</span></div>`:`<figcaption><span class="mono red">${o.tag}</span><h3>${o.name}</h3><p>${o.desc}</p></figcaption>`;
 ['h','v'].forEach(k=>$('#r'+k).innerHTML=SHOW[k].map((o,i)=>`<figure class="cd${o.src?'':' nov'}" data-r="${k=='h'?'Clip':'Reel'} 0${i+1}"><div class="px"></div><video muted loop playsinline preload="metadata" ${o.src?`src="${o.src}"`:''} onerror="this.parentNode.classList.add('nov')"></video><span class="tc mono">${k=='h'?'16:9':'9:16'} • 0${i+1}</span>${cap(o,k)}</figure>`).join(''));
