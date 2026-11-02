@@ -98,11 +98,25 @@ section{overflow:hidden;isolation:isolate}
 .ov h3{font:700 18px Inter;margin-top:6px}.tg{font:500 10px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;background:var(--r);padding:2px 8px;border-radius:3px}
 .pill{background:#ffffff22;backdrop-filter:blur(8px);padding:3px 11px;border-radius:99px;color:#fff;letter-spacing:0;text-transform:none}
 .cd figcaption .mono.red{color:var(--r);font-weight:600}.cd figcaption h3{margin-top:4px}
-.row.h,.row.v{grid-template-columns:repeat(4,1fr)}
+.row.h{grid-template-columns:repeat(2,1fr);gap:22px}.row.v{grid-template-columns:repeat(4,1fr)}.row.h .ov h3{font-size:22px}
 @media(max-width:1000px){.row.h{grid-template-columns:repeat(2,1fr)}.row.v{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.row.h{grid-template-columns:1fr}.row.v{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:820px){.hl{position:relative;left:0;top:0;max-width:none;padding:90px 6vw 0;z-index:6}.hi{font-size:9vw}.nm{font-size:22vw}.rl{font-size:6vw}.pg{max-width:none;font-size:13px}
-.pf{font-size:34vw;top:26vh}.ph{width:90vw;margin-left:-45vw;height:60vh}.st{display:none}#hero{min-height:130vh}.rv,.ct{grid-template-columns:1fr}nav div a{margin-left:16px}}
+@media(max-width:820px){
+#hero{display:flex;flex-direction:column;min-height:100svh}
+nav{position:fixed;padding:14px 5vw;background:linear-gradient(#050506f2,#050506b0);backdrop-filter:blur(12px)}
+nav .lg{font-size:22px}nav div a{margin-left:16px;font-size:12px}
+.hl{order:1;position:relative;left:0;top:0;max-width:none;padding:92px 6vw 0;z-index:6}
+.hi{font-size:11vw}.nm{font-size:25vw}.rl{font-size:7vw;margin:3vw 0}.pg{max-width:none;font-size:13.5px}.cta{margin-top:18px}
+.pf{order:2;position:relative;top:auto;font-size:25vw;margin-top:8vw}
+.ph{order:3;position:relative;left:auto;bottom:auto;margin:-17vw auto 0;width:92vw;height:112vw;max-height:70vh}
+.st{order:4;position:relative;right:auto;top:auto;display:flex;justify-content:space-around;padding:18px 6vw 26px;background:linear-gradient(transparent,#050506 55%);z-index:6;margin-top:-40px}
+.st div{margin:0;text-align:center}.st b{font-size:11vw}
+.rv,.ct{grid-template-columns:1fr}.orb{width:260px;height:260px}}
+@media(max-width:600px){
+section{padding:9vh 5vw}.hd{margin-bottom:26px}.row{gap:12px}.row.h{gap:14px}
+.row.h .ov h3{font-size:17px}.ov{padding:30px 12px 10px}.pill{font-size:10px;padding:2px 9px}
+.mq div{font-size:24px;gap:40px}input,select,textarea{font-size:16px}footer{text-align:center}}
+@media(hover:none){.cd:not(.nov):after{content:"\25B6";position:absolute;right:10px;top:10px;z-index:3;width:30px;height:30px;display:grid;place-items:center;background:#000a;border-radius:50%;font-size:11px}.cd.pl:after{display:none}}
 @media(prefers-reduced-motion:reduce){#intro,#ed,#cur{display:none}[data-r],.pf span{opacity:1!important;transform:none!important;filter:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -113,7 +127,7 @@ section{overflow:hidden;isolation:isolate}
 <header id="hero">
   <nav><a class="lg" href="#hero">TEJS<span class="red">.</span></a><div><a href="#work">Work</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a></div></nav>
   <h1 class="pf an" id="pf" aria-label="Portfolio"></h1>
-  <div class="ph" data-r="Portrait"><img src="Young Man in Headphones Profile Cutout.png" alt="Tejs" onerror="if(!this.dataset.f){this.dataset.f=1;this.className='jpg';this.src='Young Man in Headphones Profile Cutout.png'}else{this.outerHTML='<div class=sil></div>'}"></div>
+  <div class="ph" data-r="Portrait"><img src="tejs-cutout.png" alt="Tejs" onerror="if(!this.dataset.f){this.dataset.f=1;this.className='jpg';this.src='img1.jpeg'}else{this.outerHTML='<div class=sil></div>'}"></div>
   <div class="hl">
     <div class="hi" data-r="Text">Hello, I’m</div>
     <div class="nm an" data-r="Heading">Tejs<i>.</i></div>
@@ -122,12 +136,7 @@ section{overflow:hidden;isolation:isolate}
     <a class="cta" href="#work" data-r="Button">See my work &nbsp;→</a>
     <span class="mono loc" data-r="Location">Washim, Maharashtra • Worldwide</span>
   </div>
-  <div class="st" data-r="Stats">
-    <div><b><span class="n" data-n="8">0</span>.</b><small>Selected edits</small></div>
-    <div><b><span class="n" data-n="6">0</span>.</b><small>Client reviews</small></div>
-    <div><b><span class="n" data-n="3">0</span>.</b><small>Editing tools</small></div>
-  </div>
-</header>
+  </header>
 
 <section id="work"><i class="orb" data-p="-.14" style="top:8%;left:-6%"></i><i class="orb" data-p=".12" style="bottom:4%;right:-8%"></i>
   <div class="mono" data-r="Tag">01 / Selected Work</div>
@@ -182,16 +191,16 @@ $('#mq').innerHTML=['Pizzatoons','Meta Ninza','Sahib Kaur','Wedprisam','Vault of
 /* ✏️ EDIT HERE — your original 4+4 are first; slots 5–8 are ready — paste your file name into src:'' (empty src shows a placeholder) */
 const SHOW={
  h:[{src:"meta ninza_1.mp4",name:"Cinematic Brand Story",tag:"Brand Film",tool:"Pr + Ae"},{src:"VJ Event_2.mp4",name:"Royal Wedding Aftermovie",tag:"Wedding &amp; Events",tool:"Premiere Pro"},{src:"6MONTH BABY demo_1.mp4",name:"6-Month Celebration Film",tag:"Family Film",tool:"Pr + Ae"},{src:"BTS.mp4",name:"Creative Production BTS",tag:"Behind the Scenes",tool:"After Effects"}
- ,{src:'',name:'Vision in Motion',tag:'Corporate Film',tool:'Premiere Pro'}
- ,{src:'',name:'Crafted to Be Noticed',tag:'Product Ad',tool:'Pr + Ae'}
+ ,{src:'',name:'Luxury Wedding Edit',tag:'Wedding Film',tool:'Premiere Pro'}
+ ,{src:'',name:'Free Fire Player Introduction',tag:'Gaming Edit',tool:'Pr + Ae'}
  ,{src:'',name:'Stories Worth Telling',tag:'Documentary',tool:'Premiere Pro'}
  ,{src:'',name:'Design in Motion',tag:'Motion Graphics',tool:'After Effects'}
  ],
  v:[{src:"car_delivery.mp4",name:"Luxury on the Move",tag:"Automotive Film",desc:"A cinematic automotive edit with dynamic framing, refined pacing and impactful sound design."},{src:"Lambo.mp4",name:"Lamborghini — Pure Performance",tag:"Automotive Showcase",desc:"A high-energy supercar showcase built around bold visuals, smooth transitions and beat-synced cuts."},{src:"real_estate.mp4",name:"Spaces That Inspire",tag:"Real Estate",desc:"A polished property film highlighting interiors, architectural details and the atmosphere of the space."},{src:"caption_reel.mp4",name:"Words That Make an Impact",tag:"Social Media Reel",desc:"A fast-paced caption-led reel with clear typography, engaging rhythm and precise sound sync."}
- ,{src:'',name:'Style in Every Frame',tag:'Fashion Reel',desc:'A stylish fashion reel with sharp cuts, smooth speed ramps and rhythm-driven transitions.'}
- ,{src:'',name:'Taste the Moment',tag:'Food & Cafe',desc:'A mouth-watering food reel with close-up detail, warm color grading and crisp sound design.'}
- ,{src:'',name:'Moments That Move',tag:'Event Teaser',desc:'A high-energy event teaser built around crowd moments, beat-synced cuts and bold visual effects.'}
- ,{src:'',name:'Made to Stand Out',tag:'Product Reel',desc:'A clean product showcase with dynamic motion graphics, polished transitions and punchy pacing.'}
+ ,{src:'',name:'Burgertoons Opening Edit',tag:'Animated Content',desc:'A fun, high-energy opening edit with snappy transitions, comic timing and sound design that hooks viewers from the very first second.'}
+ ,{src:'',name:'Raksha Hospitality',tag:'Hospitality Brand',desc:'A premium promotional edit showcasing properties and dining experiences with warm tones, smooth movement and a luxury feel.'}
+ ,{src:'',name:'AI Generated Motion Design',tag:'AI Motion Design',desc:'An AI-generated motion design piece blending futuristic visuals, fluid animation and rhythm-driven transitions.'}
+ ,{src:'',name:'Real Estate Marble AI Generated',tag:'Real Estate • AI',desc:'An AI-generated real estate showcase featuring elegant marble interiors, cinematic camera moves and a polished luxury finish.'}
  ]};
 const cap=(o,k)=>!o.name?'':k=='h'?`<div class="ov"><div><span class="tg">${o.tag}</span><h3>${o.name}</h3></div><span class="pill mono">${o.tool}</span></div>`:`<figcaption><span class="mono red">${o.tag}</span><h3>${o.name}</h3><p>${o.desc}</p></figcaption>`;
 ['h','v'].forEach(k=>$('#r'+k).innerHTML=SHOW[k].map((o,i)=>`<figure class="cd${o.src?'':' nov'}" data-r="${k=='h'?'Clip':'Reel'} 0${i+1}"><div class="px"></div><video muted loop playsinline preload="metadata" ${o.src?`src="${o.src}"`:''} onerror="this.parentNode.classList.add('nov')"></video><span class="tc mono">${k=='h'?'16:9':'9:16'} • 0${i+1}</span>${cap(o,k)}</figure>`).join(''));
@@ -202,15 +211,15 @@ const COL=['#ffffff','#5eead4','#f472b6','#fbbf24','#60a5fa','#c4b5fd','#fb7185'
 const CUR=22; /* cursor height in px — same as a real OS pointer; raise/lower to taste */
 let mode=0,lastS=-1,lenis=null;
 if(window.Lenis&&!matchMedia('(prefers-reduced-motion:reduce)').matches){lenis=new Lenis({lerp:.085,wheelMultiplier:.9});lenis.stop()}
-const cs=[...Array(14)].map((_,i)=>{const e=document.createElement('i');
+const cs=[...Array(vw()<820?8:14)].map((_,i)=>{const e=document.createElement('i');
   e.innerHTML=`<svg width="${CUR*15/22|0}" height="${CUR}" viewBox="0 0 15 22"><path d="M1 1V18L5.2 14.2L8 21L10.8 19.8L8.1 13.2H13.5Z" fill="${i%2?COL[i%8]:'#fff'}" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
   cu.append(e);return{e,x:vw()*(.35+R()*.3),y:vh()*(.35+R()*.3),tx:vw()/2,ty:vh()/2,k:.04+R()*.05,lock:0,ph:R()*6.3,fx:.6+R()*.9,fy:.6+R()*.9,bx:0,by:0,s0:0}});
 const ox=(c,s)=>Math.sin(s*.0013*c.fx+c.ph)*vw()*.32,oy=(c,s)=>Math.cos(s*.001*c.fy+c.ph)*vh()*.3;
 const swarm=()=>cs.forEach(c=>{c.tx=vw()/2+(R()-.5)*260;c.ty=vh()/2+(R()-.5)*200});
-function scrollFx(s){
+function scrollFx(s){const m=vw()<820?.4:1;
   $('#pl').style.height=(s/Math.max(1,document.body.scrollHeight-vh())*100)+'vh';
-  $('.pf').style.translate=`0 ${s*.28}px`;$('.ph').style.translate=`0 ${s*.1}px`;$('.st').style.translate=`0 ${s*.15}px`;
-  const h=$('.hl');h.style.translate=`0 ${s*.2}px`;h.style.opacity=Math.max(0,1-s/(vh()*.8));
+  $('.pf').style.translate=`0 ${s*.28*m}px`;$('.ph').style.translate=`0 ${s*.1*m}px`;
+  const h=$('.hl');h.style.translate=`0 ${s*.2*m}px`;h.style.opacity=Math.max(0,1-s/(vh()*.8));
   $$('.cd video').forEach(v=>{const r=v.parentNode.getBoundingClientRect();v.style.translate=`0 ${(r.top+r.height/2-vh()/2)*-.06}px`});
   $$('.orb').forEach(o=>o.style.translate=`0 ${o.parentNode.getBoundingClientRect().top*o.dataset.p}px`)}
 requestAnimationFrame(function tick(t){
@@ -239,7 +248,7 @@ function guides(){for(let i=0;i<7;i++){const g=document.createElement('div');g.c
   g.style[i%2?'top':'left']=(R()*(i%2?vh():vw()))+'px';g.style.animationDelay=R()*500+'ms';ed.append(g)}
   for(let i=0;i<9;i++){const c=document.createElement('div');c.className='ch';c.textContent='+';c.style.cssText=`left:${R()*vw()}px;top:${R()*vh()}px;animation-delay:${R()*700}ms`;ed.append(c)}}
 function intro(){
-  const parts=[['.hi','Text'],['.nm','Heading'],['.rl','Role'],['.pg','Paragraph'],['.cta','Button'],['.loc','Location'],['.st','Stats']];
+  const parts=[['.hi','Text'],['.nm','Heading'],['.rl','Role'],['.pg','Paragraph'],['.cta','Button'],['.loc','Location']];
   swarm();setTimeout(swarm,450);
   setTimeout(()=>{$('#intro').classList.add('out');guides()},900);
   setTimeout(()=>edit($('.ph'),'Frame',0,1),1000);
@@ -253,13 +262,16 @@ function intro(){
 /* scroll sections reuse the same build animation */
 function boot(){
   const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){io.unobserve(en.target);
-    const d=en.target.matches('.cd,.it')?[...en.target.parentNode.children].indexOf(en.target)%4*140:0;edit(en.target,en.target.dataset.r,d)}}),{threshold:.25});
+    const d=en.target.matches('.cd,.it')?[...en.target.parentNode.children].indexOf(en.target)%(en.target.parentNode.id=='rh'?2:4)*140:0;edit(en.target,en.target.dataset.r,d)}}),{threshold:.25});
   $$('section [data-r]').forEach(e=>io.observe(e));
 }
 function countUp(){$$('.n').forEach(n=>{const t=+n.dataset.n,s=performance.now();(function f(now){const p=Math.min((now-s)/1200,1);n.textContent=Math.round(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(s)})}
 
 /* video hover play / unmute, progress line, WhatsApp form */
-$$('.cd').forEach(c=>{const v=$('video',c);c.onmouseenter=()=>{v.muted=false;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})};c.onmouseleave=()=>{v.pause();v.muted=true}});
+const play=v=>{v.muted=false;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})};
+$$('.cd').forEach(c=>{const v=$('video',c);v.onplay=()=>c.classList.add('pl');v.onpause=()=>c.classList.remove('pl');
+  if(matchMedia('(hover:hover)').matches){c.onmouseenter=()=>play(v);c.onmouseleave=()=>{v.pause();v.muted=true}}
+  else c.onclick=()=>{if(v.paused){$$('.cd video').forEach(x=>x.pause());play(v)}else v.pause()}});
 $$('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=$(a.getAttribute('href'));lenis?lenis.scrollTo(t,{duration:1.5}):t.scrollIntoView({behavior:'smooth'})});
 $('#f').onsubmit=e=>{e.preventDefault();const f=e.target,t=`*New Project Inquiry*%0AName: ${f.n.value}%0AEmail: ${f.e.value}%0AInstagram: ${f.i.value||'-'}%0AService: ${f.s.value}%0AMessage: ${f.m.value}`;
   open('https://wa.me/917020071100?text='+t.replace(/ /g,'%20'),'_blank')};
